@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Runtime.Serialization;
 
 namespace ORMapper.Models
 {
@@ -39,7 +40,7 @@ namespace ORMapper.Models
         public string RemoteTable { get; internal set; }
         public string RemoteColumnName { get; internal set; }
         public bool IsManyToMany { get; internal set; }
-
+        public bool IsEnum { get;internal set; }
 
         public object GetValue(object obj)
         {
@@ -74,7 +75,6 @@ namespace ORMapper.Models
                 }
                 return Table._GetEntity().PrimaryKey.ToColumnType(Table._GetEntity().PrimaryKey.GetValue(value));
             }
-            
             if (Type == ColumnType)
             {
                 return value;
@@ -125,7 +125,7 @@ namespace ORMapper.Models
 
             if (Type.IsEnum)
             {
-                return Enum.ToObject(Type, value);
+                return Enum.Parse(ColumnType, value.ToString());
             }
             return value;
         }
