@@ -23,9 +23,9 @@ namespace ORMapper.Models
         public string ColumnName { get; internal set; }
         public Type ColumnType { get; internal set; }
 
-        public bool isPrimaryKey { get; internal set; }
-        public bool isForeignKey { get; internal set; }
-        public bool isNullable { get; internal set; }
+        public bool IsPrimaryKey { get; internal set; }
+        public bool IsForeignKey { get; internal set; }
+        public bool IsNullable { get; internal set; }
 
         public Column(Table entity)
         {
@@ -36,7 +36,7 @@ namespace ORMapper.Models
         {
             get; internal set;
         } = false;
-        public string AssignamnetTable { get; internal set; }
+        public string RemoteTable { get; internal set; }
         public string RemoteColumnName { get; internal set; }
         public bool IsManyToMany { get; internal set; }
 
@@ -66,7 +66,7 @@ namespace ORMapper.Models
         }
         public object ToColumnType(object value)
         {
-            if (isForeignKey)
+            if (IsForeignKey)
             {
                 if (value == null)
                 {
@@ -99,7 +99,7 @@ namespace ORMapper.Models
 
         public object ToFieldType(object value) //,ICollection<object> localcache
         {
-            if (isForeignKey)
+            if (IsForeignKey)
             {
                 return Orm._CreateObject(Type, value);
             }

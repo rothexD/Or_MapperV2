@@ -100,7 +100,7 @@ namespace ORMapper
                 p.Value = ent.Columns[i].ToColumnType(ent.Columns[i].GetValue(o));
                 command.Parameters.Add(p);
 
-                if (!ent.Columns[i].isPrimaryKey)
+                if (!ent.Columns[i].IsPrimaryKey)
                 {
                     if (first)
                     { 

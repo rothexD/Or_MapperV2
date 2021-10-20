@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ORMapper", "ORMapper\ORMapper.csproj", "{227E841B-4AA0-4383-A053-623663698FD2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShowcaseOrm", "ShowcaseOrm\ShowcaseOrm.csproj", "{EEB2099D-7DC7-4427-B14C-164BDE47C640}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{227E841B-4AA0-4383-A053-623663698FD2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{227E841B-4AA0-4383-A053-623663698FD2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{227E841B-4AA0-4383-A053-623663698FD2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EEB2099D-7DC7-4427-B14C-164BDE47C640}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EEB2099D-7DC7-4427-B14C-164BDE47C640}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EEB2099D-7DC7-4427-B14C-164BDE47C640}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EEB2099D-7DC7-4427-B14C-164BDE47C640}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

@@ -1,5 +1,5 @@
 CREATE DATABASE cardgame ENCODING 'UTF-8';
-connect to "cardgame" as main;
+\c cardgame; 
 
 Create table if not exists users
 (

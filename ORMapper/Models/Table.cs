@@ -51,19 +51,19 @@ namespace ORMapper.Models
                     if(fattr is PrimaryKeyAttribute)
                     {
                         PrimaryKey = field;
-                        field.isPrimaryKey = true;
+                        field.IsPrimaryKey = true;
                     }
                     field.ColumnName = (fattr?.ColumnName ?? info.Name);
                     field.ColumnType = (fattr?.ColumnType ?? info.PropertyType);
-                    field.isNullable = fattr.Nullable;
+                    field.IsNullable = fattr.Nullable;
 
-                    if(field.isForeignKey = (fattr is ForeignKeyAttribute))
+                    if(field.IsForeignKey = (fattr is ForeignKeyAttribute))
                     {
                         field.IsExternal = typeof(IEnumerable).IsAssignableFrom(info.PropertyType);
 
-                        field.AssignamnetTable = ((ForeignKeyAttribute)fattr).RemoteTableName;
+                        field.RemoteTable = ((ForeignKeyAttribute)fattr).RemoteTableName;
                         field.RemoteColumnName = ((ForeignKeyAttribute)fattr).RemoteColumnName;
-                        field.IsManyToMany = (!string.IsNullOrWhiteSpace(field.AssignamnetTable));
+                        field.IsManyToMany = (!string.IsNullOrWhiteSpace(field.RemoteTable));
                     }
                 }
                 else
@@ -71,7 +71,7 @@ namespace ORMapper.Models
                     if ((info.GetGetMethod() == null) || (!info.GetGetMethod().IsPublic)) { continue; }
                     field.ColumnType = info.PropertyType;
                     field.ColumnName = info.Name;
-                    field.isNullable = false;
+                    field.IsNullable = false;
                 }
                 field.Member = info;
                 column.Add(field);
