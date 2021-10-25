@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Reflection;
 using System.Runtime.Serialization;
 
@@ -65,7 +66,7 @@ namespace ORMapper.Models
                 throw new NotSupportedException("Member type not supported");
             }
         }
-        public object ToColumnType(object value,List<object> localchache)
+        public object ToColumnType(object value,ICollection<object> localchache)
         {
             if (IsForeignKey)
             {

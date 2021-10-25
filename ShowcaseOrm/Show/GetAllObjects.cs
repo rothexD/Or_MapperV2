@@ -19,9 +19,11 @@ namespace ShowcaseOrm.Show
                 {
                     ReferenceLoopHandling = ReferenceLoopHandling.Ignore 
                 }));
-        
-        
-                /**/
+            var i = Orm.GetAll<Teacher>("t.1ton");
+            i[0].Courses[0].Name = "changedAgain";
+            i[0].Classes[0].Name = "changedAgain";
+            Orm.Save(i[0]);
+            
             Console.WriteLine("\n");
         }
     }

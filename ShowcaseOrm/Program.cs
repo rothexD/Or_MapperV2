@@ -15,7 +15,7 @@ namespace ShowcaseOrm
         {
             Orm.Connectionstring = "Server=127.0.0.1;Port=5438;Database=school;User Id=postgres;Password=postgres;";
            
-            Console.WriteLine(counter.counterI);
+            /*Console.WriteLine(counter.counterI);
             InsertModifyShouldsave.Show();
             Thread.Sleep(1000);
             Console.WriteLine(counter.counterI);
@@ -24,14 +24,14 @@ namespace ShowcaseOrm
             Console.WriteLine(counter.counterI);
             ModifyObject.Show();
             Thread.Sleep(1000);
-            Console.WriteLine(counter.counterI);
+            Console.WriteLine(counter.counterI);*/
             GetAllObjets.Show();
-            Thread.Sleep(1000);
+            /*Thread.Sleep(1000);
             Console.WriteLine(counter.counterI);
             TryCourse.Show();
             Thread.Sleep(1000);
             Console.WriteLine(counter.counterI);
-            insertClass.Show();
+            insertClass.Show();*/
             
         }
     }

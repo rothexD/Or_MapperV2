@@ -62,7 +62,7 @@ namespace ORMapper
                 var list = Activator.CreateInstance(i.Type) as IList;
                 if (i.IsExternal)
                 {
-                    var value = _CreateObjectAll(i.Type.GetGenericArguments()[0], localcache) as IList;
+                    var value = _CreateObjectAll(i.Type.GetGenericArguments()[0], localcache, i.Table.PrimaryKey.GetValue(returnObject),i.ColumnName) as IList;
                     i.SetValue(returnObject, value);
                 }
             }
@@ -97,15 +97,20 @@ namespace ORMapper
             return returnObject;
         }
 
-        private static object _CreateObjectAll(Type t, ICollection<object> localcache)
+        private static object _CreateObjectAll(Type t, ICollection<object> localcache, object pk,string foreignkeytablename)
         {
             var con = Connection();
             con.CustomOpen();
             var command = con.CreateCommand();
 
+            Console.WriteLine(pk);
+            command.CommandText = pk == null
+                ? t._GetEntity().GetSelectSQL(null)
+                : t._GetEntity().GetSelectSQL(null) + " Where " + foreignkeytablename + " = :pk";
+            
+            Console.WriteLine(command.CommandText);
 
-            command.CommandText = t._GetEntity().GetSelectSQL(null);
-
+            Parameterhelper.ParaHelp(":pk", pk, command);
             var reader = command.ExecuteReader();
 
             var listType = typeof(List<>);
@@ -115,6 +120,8 @@ namespace ORMapper
 
 
             while (reader.Read()) objectlist.Add(_CreateObject(t, reader, localcache));
+            
+            
             reader.Close();
             reader.Dispose();
             command.Dispose();
@@ -124,7 +131,17 @@ namespace ORMapper
 
         public static void Save(object o)
         {
-            SaveInternal(o, new List<object>());
+            if (o is IEnumerable)
+            {
+                foreach (var x in o as IEnumerable)
+                {
+                    SaveInternal(x,new List<object>());
+                }
+            }
+            else
+            {
+                SaveInternal(o, new List<object>());
+            }
         }
 
         internal static void SaveInternal(object o, List<object> localcache)
@@ -184,15 +201,13 @@ namespace ORMapper
             command.ExecuteNonQuery();
             command.Dispose();
             con.CloseCustom();
-           
+
             for (var i = 0; i < ent.Externals.Length; i++)
-            {
                 foreach (var x in ent.Externals[i].GetValue(o) as IEnumerable)
                 {
                     SaveInternal(x, localcache);
                     localcache.Add(x);
-                } 
-            }
+                }
         }
 
 
@@ -201,9 +216,9 @@ namespace ORMapper
             return (T) _CreateObject(typeof(T), pk, new List<object>());
         }
 
-        public static List<T> GetAll<T>()
+        public static List<T> GetAll<T>(object pk = null)
         {
-            return (List<T>) _CreateObjectAll(typeof(T), new List<object>());
+            return (List<T>) _CreateObjectAll(typeof(T), new List<object>(), pk,typeof(T)._GetEntity().PrimaryKey.ColumnName);
         }
 
         public static void Delete<T>(object pk)
