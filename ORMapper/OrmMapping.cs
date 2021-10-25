@@ -8,6 +8,11 @@ namespace ORMapper
 {
     public static class OrmMapping
     {
+        /// <summary>
+        /// prints Sql Statements to console in order
+        /// </summary>
+        /// <param name="Tables">Array of Types that represent Tables that should be parsed</param>
+        /// <param name="enums">Array of Types that represent Enums that should be parsed</param>
         public static void Map(Type[] Tables, Type[] enums)
         {
             List<string> sqlCommands = new();
@@ -20,12 +25,19 @@ namespace ORMapper
 
             print(sqlCommands);
         }
-
+        /// <summary>
+        /// prints a list of strings to console
+        /// </summary>
+        /// <param name="sqlCommands">a list of strings in order of which they should be executed</param>
         private static void print(List<string> sqlCommands)
         {
             foreach (var line in sqlCommands) Console.WriteLine(line);
         }
-
+        /// <summary>
+        /// parses enumns into a list of create strings
+        /// </summary>
+        /// <param name="sqlcommands">list of sqlstrings which the new commands are added too</param>
+        /// <param name="enums">list of enums that should be parsed</param>
         private static void parseEnums(List<string> sqlcommands, Type[] enums)
         {
             foreach (var i in enums)
@@ -42,35 +54,39 @@ namespace ORMapper
                 sqlcommands.Add(sql);
             }
         }
-
+        /// <summary>
+        /// parses tables into a list of create strings
+        /// </summary>
+        /// <param name="sqlcommands">list of sqlstrings which the new commands are added too</param>
+        /// <param name="Tables">list of tables that should be parsed</param>
         private static void parseTables(List<string> sqlcommands, Type[] Tables)
         {
-            List<string> foreignkeys = new();
+            List<string> foreingKeySqlList = new();
             foreach (var i in Tables)
             {
-                var sql = "Create Table " + i._GetEntity().TableName + "(";
-                foreach (var column in i._GetEntity().Columns)
+                var createSqlScript = "Create Table " + i._GetTable().TableName + "(";
+                foreach (var column in i._GetTable().Columns)
                 {
                     if (!column.IsForeignKey)
                     {
-                        sql += column.ColumnName + " " + toDatabaseType(column.Type) + " ";
-                        if (!column.IsNullable) sql += " not null ";
-                        if (column.IsPrimaryKey) sql += " primary key ";
+                        createSqlScript += column.ColumnName + " " + toDatabaseType(column.Type) + " ";
+                        if (!column.IsNullable) createSqlScript += " not null ";
+                        if (column.IsPrimaryKey) createSqlScript += " primary key ";
 
-                        sql += ", ";
+                        createSqlScript += ", ";
                     }
                     else
                     {
                         if(column.ColumnType.GetInterface(nameof(ICollection)) == null)
                         {
-                            sql += column.ColumnName + " " + toDatabaseType(column.Type._GetEntity().PrimaryKey.Type) + " not null ,";
+                            createSqlScript += column.ColumnName + " " + toDatabaseType(column.Type._GetTable().PrimaryKey.Type) + " not null ,";
                         }
                         if (!column.IsManyToMany)
                         {
 
                             Column insert = (column.ColumnType.GetInterface(nameof(ICollection)) != null)
-                                ? column.Type.GetGenericArguments()[0]._GetEntity().PrimaryKey
-                                : column.Type._GetEntity().PrimaryKey;
+                                ? column.Type.GetGenericArguments()[0]._GetTable().PrimaryKey
+                                : column.Type._GetTable().PrimaryKey;
                             
                             string a;
                             string b;
@@ -91,11 +107,11 @@ namespace ORMapper
                                 c = column.Table.TableName;
                                 d = insert.Table.PrimaryKey.ColumnName;
                             }
-                            foreignkeys.Add("Alter table " + a + " ADD Constraint \"" +
+                            foreingKeySqlList.Add("Alter table " + a + " ADD Constraint \"" +
                                             Math.Abs(Guid.NewGuid().GetHashCode() + Guid.NewGuid().GetHashCode() *100000) +
                                             "\" Foreign Key (" + b +
                                             ") references " + c + "(" +
-                                            d +");");
+                                            d +") on update cascade;");
                         }
                         else
                         {
@@ -106,22 +122,22 @@ namespace ORMapper
 
                             if (column.MyReferenceToThisColumnName != null)
                             {
-                                a = column._GetEntity().TableName;
+                                a = column._GetTable().TableName;
                             }
                             
-                            foreignkeys.Add("Alter table " + column.RemoteTable._GetEntity().TableName + " ADD Constraint \"" +
+                            foreingKeySqlList.Add("Alter table " + column.RemoteTable._GetTable().TableName + " ADD Constraint \"" +
                                             Math.Abs(Guid.NewGuid().GetHashCode() + Guid.NewGuid().GetHashCode() *100000) +
                                             "\" Foreign Key (" + column.MyReferenceToThisColumnName  +
                                             ") references " + column.Table.TableName + "(" +
-                                            column.Table.PrimaryKey.ColumnName +");");
+                                            column.Table.PrimaryKey.ColumnName +") on update cascade;");
                         }
                     }
                 }
-                sql = sql.Trim().Trim(',');
-                sql += ");";
-                sqlcommands.Add(sql);
+                createSqlScript = createSqlScript.Trim().Trim(',');
+                createSqlScript += ");";
+                sqlcommands.Add(createSqlScript);
             }
-            foreach (var y in foreignkeys) sqlcommands.Add(y);
+            foreach (var y in foreingKeySqlList) sqlcommands.Add(y);
         }
 
         private static string toDatabaseType(Type e)

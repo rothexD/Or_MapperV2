@@ -14,39 +14,66 @@ namespace ORMapper
         private static readonly Dictionary<Type, Table> _mappedEntities = new();
         public static string Connectionstring = "";
 
+        /// <summary>
+        /// creates a new connection
+        /// </summary>
+        /// <returns>returns a new connection</returns>
         public static IDbConnection Connection()
         {
             return new NpgsqlConnection(Connectionstring);
             ;
         }
-
-        internal static Table _GetEntity(this object o)
+        /// <summary>
+        /// gets the table Entity for a given object by referencing its Type
+        ///
+        /// (Class)._GetTable = Enitiy of class
+        ///
+        /// Internal Storage in a Dictionary (Type,Table)
+        ///
+        /// if Enitity does not exist in dictionary, create a new one and add to dictionary
+        /// </summary>
+        /// <param name="o">object whos Enitity should be returned</param>
+        /// <returns>a mapped Entity</returns>
+        internal static Table _GetTable(this object o)
         {
             var t = o is Type ? (Type) o : o.GetType();
 
             if (!_mappedEntities.ContainsKey(t)) _mappedEntities.Add(t, new Table(t));
             return _mappedEntities[t];
         }
-
-        internal static object Searchcache(Type t, object pk, ICollection<object> localcache)
+        /// <summary>
+        /// searches in a localcache for a object that matches it
+        /// </summary>
+        /// <param name="findObjectOfType">tries to find a object of this type</param>
+        /// <param name="pk">the primary key that identifies the object</param>
+        /// <param name="localcache">a localcache</param>
+        /// <returns>null if not in cache, object if in cache</returns>
+        internal static object SearchIncache(Type findObjectOfType, object pk, ICollection<object> localcache)
         {
             if (localcache == null) return null;
             foreach (var i in localcache)
             {
-                if (i.GetType() != t) continue;
+                if (i.GetType() != findObjectOfType) continue;
 
-                if (t._GetEntity().PrimaryKey.GetValue(i).Equals(pk)) return i;
+                if (findObjectOfType._GetTable().PrimaryKey.GetValue(i).Equals(pk)) return i;
             }
 
             return null;
         }
 
-
-        internal static object _CreateObject(Type t, IDataReader reader, ICollection<object> localcache, bool caching = true)
+        /// <summary>
+        /// Creates a table object that represents an entry
+        /// </summary>
+        /// <param name="t">create a table object which should be created</param>
+        /// <param name="reader">A Datareader with data to fill the objet</param>
+        /// <param name="localcache"></param>
+        /// <param name="shouldMethodUseCaching">should this method use caching, by default true</param>
+        /// <returns>a column object</returns>
+        internal static object _CreateObject(Type t, IDataReader reader, ICollection<object> localcache, bool shouldMethodUseCaching = true)
         {
-            var returnObject = caching ? Searchcache(t,
-                t._GetEntity().PrimaryKey
-                    .ToFieldType(reader.GetValue(reader.GetOrdinal(t._GetEntity().PrimaryKey.ColumnName)), localcache),
+            var returnObject = shouldMethodUseCaching ? SearchIncache(t,
+                t._GetTable().PrimaryKey
+                    .ToFieldType(reader.GetValue(reader.GetOrdinal(t._GetTable().PrimaryKey.ColumnName)), localcache),
                 localcache) : null ;
 
             if (returnObject == null)
@@ -55,11 +82,11 @@ namespace ORMapper
                 localcache.Add(returnObject = Activator.CreateInstance(t));
             }
 
-            foreach (var i in t._GetEntity().Internals)
+            foreach (var i in t._GetTable().Internals)
                 i.SetValue(returnObject, i.ToFieldType(reader.GetValue(reader.GetOrdinal(i.ColumnName)), localcache));
 
 
-            foreach (var i in t._GetEntity().Externals)
+            foreach (var i in t._GetTable().Externals)
             {
                 var list = Activator.CreateInstance(i.Type) as IList;
                 if (i.IsExternal && !i.IsManyToMany)
@@ -71,35 +98,42 @@ namespace ORMapper
 
                 if (i.IsExternal && i.IsManyToMany)
                 {
-                    var reflist = _CreateObjectAll(i.RemoteTable, localcache,
+                    var referencesFromNtoMTable = _CreateObjectAll(i.RemoteTable, localcache,
                         i.Table.PrimaryKey.GetValue(returnObject), i.MyReferenceToThisColumnName,false);
 
-                    var valueList = Activator.CreateInstance(i.ColumnType) as IList;
+                    var returnList = Activator.CreateInstance(i.ColumnType) as IList;
 
-                    foreach (var o in reflist as IList)
+                    foreach (var o in referencesFromNtoMTable as IList)
                     {
-                        var key = o._GetEntity().Columns.First(x => x.ColumnName.ToLower() == i.TheirReferenceToThisColumnName.ToLower());
+                        var key = o._GetTable().Columns.First(x => x.ColumnName.ToLower() == i.TheirReferenceToThisColumnName.ToLower());
                         var pk = key.GetValue(o);
-                        valueList.Add(_CreateObject(i.ColumnType.GetGenericArguments()[0], pk, localcache));
+                        returnList.Add(_CreateObject(i.ColumnType.GetGenericArguments()[0], pk, localcache));
                     }
 
-                    i.SetValue(returnObject, valueList);
+                    i.SetValue(returnObject, returnList);
                 }
             }
 
             return returnObject;
         }
-
-        internal static object _CreateObject(Type t, object pk, ICollection<object> localcache, bool caching = true)
+        /// <summary>
+        /// creates a table entry object for a given primary key
+        /// </summary>
+        /// <param name="t">creates table of type</param>
+        /// <param name="pk"></param>
+        /// <param name="localcache"></param>
+        /// <param name="shouldMethodUseCaching">should this method use caching</param>
+        /// <returns>returns a table entry</returns>
+        internal static object _CreateObject(Type t, object pk, ICollection<object> localcache, bool shouldMethodUseCaching = true)
         {
-            var returnObject = caching ? Searchcache(t, pk, localcache) : null;
+            var returnObject = shouldMethodUseCaching ? SearchIncache(t, pk, localcache) : null;
             if (returnObject != null) return returnObject;
 
             var con = Connection();
             con.CustomOpen();
             var command = con.CreateCommand();
 
-            command.CommandText = t._GetEntity().GetSelectSQL(null) + " Where " + t._GetEntity().PrimaryKey.ColumnName +
+            command.CommandText = t._GetTable().GetSelectSql(null) + " Where " + t._GetTable().PrimaryKey.ColumnName +
                                   " = :pk";
 
             Parameterhelper.ParaHelp(":pk", pk, command);
@@ -116,17 +150,25 @@ namespace ORMapper
             con.CloseCustom();
             return returnObject;
         }
-
+        /// <summary>
+        /// gets all objects that match a primary key
+        /// </summary>
+        /// <param name="t">which type of table should be created</param>
+        /// <param name="localcache"></param>
+        /// <param name="pk">primary key</param>
+        /// <param name="foreignKeyTablename"></param>
+        /// <param name="shouldMethodUseCaching"></param>
+        /// <returns>All table entries that match the pk</returns>
         private static object _CreateObjectAll(Type t, ICollection<object> localcache, object pk,
-            string foreignkeytablename, bool caching = true)
+            string foreignKeyTablename, bool shouldMethodUseCaching = true)
         {
             var con = Connection();
             con.CustomOpen();
             var command = con.CreateCommand();
 
             command.CommandText = pk == null
-                ? t._GetEntity().GetSelectSQL(null)
-                : t._GetEntity().GetSelectSQL(null) + " Where " + foreignkeytablename + " = :pk";
+                ? t._GetTable().GetSelectSql(null)
+                : t._GetTable().GetSelectSql(null) + " Where " + foreignKeyTablename + " = :pk";
 
 
             Parameterhelper.ParaHelp(":pk", pk, command);
@@ -134,11 +176,10 @@ namespace ORMapper
 
             var listType = typeof(List<>);
             var constructedListType = listType.MakeGenericType(t);
-
             var objectlist = Activator.CreateInstance(constructedListType) as IList;
 
 
-            while (reader.Read()) objectlist.Add(_CreateObject(t, reader, localcache,caching));
+            while (reader.Read()) objectlist.Add(_CreateObject(t, reader, localcache,shouldMethodUseCaching));
 
 
             reader.Close();
@@ -147,23 +188,32 @@ namespace ORMapper
             con.CloseCustom();
             return objectlist;
         }
-
+        /// <summary>
+        /// public interface for save to db function
+        /// </summary>
+        /// <param name="o">object which should be stored to db</param>
         public static void Save(object o)
         {
+            
             if (o is IEnumerable)
                 foreach (var x in o as IEnumerable)
                     SaveInternal(x, new List<object>());
             else
                 SaveInternal(o, new List<object>());
         }
-
+        /// <summary>
+        /// saves to object todaterbase
+        /// </summary>
+        /// <param name="o">which object(table entry)</param>
+        /// <param name="localcache"></param>
+        /// <param name="caching">should caching be used by default true (unused)</param>
         internal static void SaveInternal(object o, List<object> localcache, bool caching = true)
         {
-            var ent = o._GetEntity();
+            var ent = o._GetTable();
             var first = true;
             if (o == null) return;
 
-            if (Searchcache(o.GetType(), o._GetEntity().PrimaryKey.GetValue(o), localcache) != null) return;
+            if (SearchIncache(o.GetType(), o._GetTable().PrimaryKey.GetValue(o), localcache) != null) return;
             localcache.Add(o);
 
             var con = Connection();
@@ -225,18 +275,32 @@ namespace ORMapper
             }
         }
 
-
+        /// <summary>
+        /// public interface for get (gets a single table entry where pk == pk)
+        /// </summary>
+        /// <param name="pk">primary key</param>
+        /// <typeparam name="T">tabl</typeparam>
+        /// <returns></returns>
         public static T Get<T>(object pk)
         {
             return (T) _CreateObject(typeof(T), pk, new List<object>());
         }
-
+        /// <summary>
+        /// public interface for getall (get all tableentries where pk == pk)
+        /// </summary>
+        /// <param name="pk"></param>
+        /// <typeparam name="T">table</typeparam>
+        /// <returns></returns>
         public static List<T> GetAll<T>(object pk = null)
         {
             return (List<T>) _CreateObjectAll(typeof(T), new List<object>(), pk,
-                typeof(T)._GetEntity().PrimaryKey.ColumnName);
+                typeof(T)._GetTable().PrimaryKey.ColumnName);
         }
-
+        /// <summary>
+        /// delete a single table entry from db
+        /// </summary>
+        /// <param name="pk">primary key</param>
+        /// <typeparam name="T">table</typeparam>
         public static void Delete<T>(object pk)
         {
             var con = Connection();
@@ -245,7 +309,7 @@ namespace ORMapper
 
 
             command.CommandText =
-                $"Delete from {typeof(T)._GetEntity().TableName} where {typeof(T)._GetEntity().PrimaryKey.ColumnName} = :pk";
+                $"Delete from {typeof(T)._GetTable().TableName} where {typeof(T)._GetTable().PrimaryKey.ColumnName} = :pk";
 
             Parameterhelper.ParaHelp(":pk", pk, command);
 

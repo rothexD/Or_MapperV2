@@ -49,7 +49,7 @@ namespace ORMapper.FluentQuery
 
         public IWhere Table(Type table)
         {
-            var tablename = table._GetEntity().TableName;
+            var tablename = table._GetTable().TableName;
             getCommand.CommandText += " " + tablename + "";
             return this;
         }

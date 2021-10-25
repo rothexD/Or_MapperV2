@@ -8,7 +8,11 @@ using ORMapper.Attributes;
 namespace ORMapper.Models
 {
     public class Table
-    {
+    {   
+        /// <summary>
+        /// Constructor, parses a Table into Columns
+        /// </summary>
+        /// <param name="type">what Type to parse</param>
         public Table(Type type)
         {
             var tattr = (TableAttribute) type.GetCustomAttribute(typeof(TableAttribute));
@@ -77,7 +81,12 @@ namespace ORMapper.Models
         public Column[] Externals { get; set; }
         public Column[] Internals { get; set; }
 
-        public string GetSelectSQL(string prefix = "")
+        /// <summary>
+        /// gets a basic select * from table statement
+        /// </summary>
+        /// <param name="prefix">defines a prefix that can be attached</param>
+        /// <returns>a sql query string</returns>
+        public string GetSelectSql(string prefix = "")
         {
             if (prefix is null) prefix = "";
 
@@ -90,15 +99,6 @@ namespace ORMapper.Models
 
             sqlString += " From " + TableName;
             return sqlString;
-        }
-
-        public Column GetFieldForColumn(string columnName)
-        {
-            columnName = columnName.ToUpper();
-            foreach (var i in Internals)
-                if (i.ColumnName.ToUpper() == columnName)
-                    return i;
-            return null;
         }
     }
 }

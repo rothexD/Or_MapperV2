@@ -2,6 +2,9 @@
 
 namespace ORMapper.Attributes
 {
+    /// <summary>
+    /// Defines a property is a coloumn
+    /// </summary>
     [AttributeUsage(AttributeTargets.Property)]
     public class ColumnAttribute : Attribute
     {

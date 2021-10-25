@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Threading;
 using ORMapper;
+using ORMapper.FluentQuery;
 using ORMapper.Models;
 using ShowcaseOrm.Models;
 using ShowcaseOrm.Show;
@@ -25,8 +26,7 @@ namespace ShowcaseOrm
             tables.Add(typeof(Teacher));
 
             OrmMapping.Map(tables.ToArray(),enums.ToArray());
-            
-            
+
             //GetStudent.Show();
             Console.WriteLine(counter.counterI);
             InsertModifyShouldsave.Show();
