@@ -1,155 +1,226 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using Npgsql;
+using ORMapper.FluentQuery;
 using ORMapper.Models;
 
 namespace ORMapper
 {
     public static class Orm
     {
-        private static Dictionary<Type, Table> _mappedEntities = new();
-        public static IDbConnection Connection;
+        private static readonly Dictionary<Type, Table> _mappedEntities = new();
+        public static string Connectionstring = "";
+
+        public static IDbConnection Connection()
+        {
+            return new NpgsqlConnection(Connectionstring);
+            ;
+        }
+
         internal static Table _GetEntity(this object o)
         {
-            Type t = (o is Type) ? (Type) o : o.GetType();
+            var t = o is Type ? (Type) o : o.GetType();
 
-            if (!_mappedEntities.ContainsKey(t))
-            {
-                _mappedEntities.Add(t, new Table(t));
-            }
+            if (!_mappedEntities.ContainsKey(t)) _mappedEntities.Add(t, new Table(t));
             return _mappedEntities[t];
         }
-        internal static object _CreateObject(Type t, IDataReader reader)
-        {
-            object returnObject = Activator.CreateInstance(t);
 
-            foreach (Column i in t._GetEntity().Columns)
+        internal static object Searchcache(Type t, object pk, ICollection<object> localcache)
+        {
+            if (localcache == null) return null;
+            foreach (var i in localcache)
             {
-                i.SetValue(returnObject, i.ToFieldType(reader.GetValue(reader.GetOrdinal(i.ColumnName))));
+                if (i.GetType() != t) continue;
+
+                if (t._GetEntity().PrimaryKey.GetValue(i).Equals(pk)) return i;
             }
+
+            return null;
+        }
+
+
+        internal static object _CreateObject(Type t, IDataReader reader, ICollection<object> localcache)
+        {
+            var returnObject = Searchcache(t,
+                t._GetEntity().PrimaryKey
+                    .ToFieldType(reader.GetValue(reader.GetOrdinal(t._GetEntity().PrimaryKey.ColumnName)), localcache),
+                localcache);
+
+            if (returnObject == null)
+            {
+                if (localcache == null) localcache = new List<object>();
+                localcache.Add(returnObject = Activator.CreateInstance(t));
+            }
+
+            foreach (var i in t._GetEntity().Internals)
+                i.SetValue(returnObject, i.ToFieldType(reader.GetValue(reader.GetOrdinal(i.ColumnName)), localcache));
+
+            foreach (var i in t._GetEntity().Externals)
+            {
+                var list = Activator.CreateInstance(i.Type) as IList;
+                if (i.IsExternal)
+                {
+                    var value = _CreateObjectAll(i.Type.GetGenericArguments()[0], localcache) as IList;
+                    i.SetValue(returnObject, value);
+                }
+            }
+
             return returnObject;
         }
 
-        internal static object _CreateObject(Type t, object pk)
+        internal static object _CreateObject(Type t, object pk, ICollection<object> localcache)
         {
-            IDbCommand command = Connection.CreateCommand();
+            var returnObject = Searchcache(t, pk, localcache);
+            if (returnObject != null) return returnObject;
 
-            command.CommandText = t._GetEntity().GetSelectSQL(null) + " Where " + t._GetEntity().PrimaryKey.ColumnName + " = :pk";
+            var con = Connection();
+            con.CustomOpen();
+            var command = con.CreateCommand();
 
-            IDataParameter p = command.CreateParameter();
-            p.ParameterName = ":pk";
-            p.Value = pk;
-            command.Parameters.Add(p);
+            command.CommandText = t._GetEntity().GetSelectSQL(null) + " Where " + t._GetEntity().PrimaryKey.ColumnName +
+                                  " = :pk";
 
-            object returnObject = null;
-            IDataReader reader = command.ExecuteReader();
+            Parameterhelper.ParaHelp(":pk", pk, command);
 
-            if (reader.Read())
-            {
-                returnObject = _CreateObject(t, reader);
-            }
+            var reader = command.ExecuteReader();
+
+            if (reader.Read()) returnObject = _CreateObject(t, reader, localcache);
             reader.Close();
             reader.Dispose();
             command.Dispose();
 
-            if (returnObject == null) { throw new Exception("no data."); }
+            if (returnObject == null) throw new Exception("no data.");
 
+            con.CloseCustom();
             return returnObject;
         }
 
-        private static object _CreateObjectAll<T>()
+        private static object _CreateObjectAll(Type t, ICollection<object> localcache)
         {
-            IDbCommand command = Connection.CreateCommand();
+            var con = Connection();
+            con.CustomOpen();
+            var command = con.CreateCommand();
 
-            command.CommandText = typeof(T)._GetEntity().GetSelectSQL(null);
 
-            IDataReader reader = command.ExecuteReader();
+            command.CommandText = t._GetEntity().GetSelectSQL(null);
 
-            var objectlist = new List<T>();
-            while (reader.Read())
-            {
-                objectlist.Add((T)_CreateObject(typeof(T), reader));
-            }
+            var reader = command.ExecuteReader();
+
+            var listType = typeof(List<>);
+            var constructedListType = listType.MakeGenericType(t);
+
+            var objectlist = Activator.CreateInstance(constructedListType) as IList;
+
+
+            while (reader.Read()) objectlist.Add(_CreateObject(t, reader, localcache));
             reader.Close();
             reader.Dispose();
             command.Dispose();
-
+            con.CloseCustom();
             return objectlist;
         }
-        
 
         public static void Save(object o)
         {
-            Table ent = o._GetEntity();
+            SaveInternal(o, new List<object>());
+        }
 
-            IDbCommand command = Connection.CreateCommand();
+        internal static void SaveInternal(object o, List<object> localcache)
+        {
+            var ent = o._GetEntity();
+            var first = true;
+            if (o == null) return;
+
+            if (Searchcache(o.GetType(), o._GetEntity().PrimaryKey.GetValue(o), localcache) != null) return;
+            localcache.Add(o);
+
+            var con = Connection();
+
+            var command = con.CreateCommand();
             command.CommandText = $"Insert into {ent.TableName} (";
-            string update = " ON CONFLICT (" + ent.PrimaryKey.ColumnName + ") DO UPDATE SET ";
-            string insert = "";
+            var update = " ON CONFLICT (" + ent.PrimaryKey.ColumnName + ") DO UPDATE SET ";
+            var insert = "";
 
-            IDataParameter p;
-            bool first = true;
-            for(int i = 0; i < ent.Columns.Length; i++)
+
+            for (var i = 0; i < ent.Internals.Length; i++)
             {
-                if (i > 0) { command.CommandText += ", "; insert += ", "; }
-                command.CommandText += ent.Columns[i].ColumnName;
-                insert += (":v" + i.ToString());
+                if (i > 0)
+                {
+                    command.CommandText += ", ";
+                    insert += ", ";
+                }
 
-                p = command.CreateParameter();
-                p.ParameterName = ":v" + i.ToString();
-                p.Value = ent.Columns[i].ToColumnType(ent.Columns[i].GetValue(o));
-                command.Parameters.Add(p);
+                if (ent.Internals[i].IsForeignKey)
+                {
+                    SaveInternal(ent.Internals[i].GetValue(o), localcache);
+                    localcache.Add(ent.Internals[i].GetValue(o));
+                }
 
-                if (!ent.Columns[i].IsPrimaryKey)
+
+                command.CommandText += ent.Internals[i].ColumnName;
+                insert += ":v" + i;
+
+                Parameterhelper.ParaHelp(":v" + i,
+                    ent.Internals?[i].ToColumnType(ent.Internals?[i].GetValue(o), localcache), command);
+
+                if (!ent.Internals[i].IsPrimaryKey)
                 {
                     if (first)
-                    { 
                         first = false;
-                    }
                     else
-                    {
                         update += ", ";
-                    }
-                    update += (ent.Columns[i].ColumnName + " = :w" + i.ToString());
 
-                    p = command.CreateParameter();
-                    p.ParameterName = ":w" + i.ToString();
-                    p.Value = ent.Columns[i].ToColumnType(ent.Columns[i].GetValue(o));
-                    command.Parameters.Add(p);
-                }             
+                    update += ent.Internals[i].ColumnName + " = :w" + i;
+
+                    Parameterhelper.ParaHelp(":w" + i,
+                        ent.Internals[i].ToColumnType(ent.Internals[i].GetValue(o), localcache), command);
+                }
             }
-            command.CommandText += (") Values (" + insert + ")" + update);
+
+            command.CommandText += ") Values (" + insert + ")" + update;
+            con.CustomOpen();
             command.ExecuteNonQuery();
             command.Dispose();
+            con.CloseCustom();
+           
+            for (var i = 0; i < ent.Externals.Length; i++)
+            {
+                foreach (var x in ent.Externals[i].GetValue(o) as IEnumerable)
+                {
+                    SaveInternal(x, localcache);
+                    localcache.Add(x);
+                } 
+            }
         }
-        
+
+
         public static T Get<T>(object pk)
         {
-            return (T) _CreateObject(typeof(T), pk);
+            return (T) _CreateObject(typeof(T), pk, new List<object>());
         }
+
         public static List<T> GetAll<T>()
         {
-            return (List<T>) _CreateObjectAll<T>();
+            return (List<T>) _CreateObjectAll(typeof(T), new List<object>());
         }
+
         public static void Delete<T>(object pk)
         {
-            IDbCommand command = Connection.CreateCommand();
+            var con = Connection();
+            con.CustomOpen();
+            var command = con.CreateCommand();
 
-            command.CommandText = $"Delete from {typeof(T)._GetEntity().TableName} where {typeof(T)._GetEntity().PrimaryKey.ColumnName} = :pk";
 
-            IDbDataParameter primaryKey = command.CreateParameter();
-            primaryKey.ParameterName = ":pk";
-            primaryKey.Value = pk;
+            command.CommandText =
+                $"Delete from {typeof(T)._GetEntity().TableName} where {typeof(T)._GetEntity().PrimaryKey.ColumnName} = :pk";
 
-            command.Parameters.Add(primaryKey);
+            Parameterhelper.ParaHelp(":pk", pk, command);
 
             command.ExecuteNonQuery();
-            command.Dispose();         
+            command.Dispose();
+            con.CloseCustom();
         }
-        public static void DbInit()
-        {
-
-        }
-        
     }
 }

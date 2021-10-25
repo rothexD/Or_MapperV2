@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using ORMapper.Attributes;
 
 namespace ShowcaseOrm.Models
@@ -18,5 +19,12 @@ namespace ShowcaseOrm.Models
         [Column(ColumnName = "HDATE")]
         /// <summary>Gets or sets the teacher's hire date.</summary>
         public DateTime HireDate { get; set; }
+
+
+        [ForeignKey(ColumnName = "KTEACHER")] 
+        public List<Class> Classes { get; private set; } = new();
+        
+        [ForeignKey(ColumnName = "KTEACHER")] 
+        public List<Course> Courses { get; private set; } = new();
     }
 }

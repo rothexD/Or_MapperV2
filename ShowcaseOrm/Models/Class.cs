@@ -1,4 +1,5 @@
-﻿using ORMapper.Attributes;
+﻿using System.Collections.Generic;
+using ORMapper.Attributes;
 
 namespace ShowcaseOrm.Models
 {
@@ -25,5 +26,6 @@ namespace ShowcaseOrm.Models
         {
             get; set;
         }
+
     }
 }

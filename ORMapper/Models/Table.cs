@@ -78,7 +78,7 @@ namespace ORMapper.Models
             }
             Columns = column.ToArray();
 
-            Internals = Columns.Where(x => !x.IsExternal).ToArray();
+            Internals = Columns.Where(x => (!x.IsExternal)).ToArray();
             Externals = Columns.Where(x => x.IsExternal).ToArray();
         }
         
@@ -87,7 +87,7 @@ namespace ORMapper.Models
             if(prefix is null) { prefix = ""; }
 
             string sqlString = "Select ";
-            for(int i = 0; i< Columns.Length; i++)
+            for(int i = 0; i< Internals.Length; i++)
             {
                 if( i > 0) { sqlString += ", "; }
                 sqlString += prefix.Trim() + Internals[i].ColumnName;

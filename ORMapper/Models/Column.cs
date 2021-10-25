@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.Serialization;
@@ -40,7 +41,6 @@ namespace ORMapper.Models
         public string RemoteTable { get; internal set; }
         public string RemoteColumnName { get; internal set; }
         public bool IsManyToMany { get; internal set; }
-        public bool IsEnum { get;internal set; }
 
         public object GetValue(object obj)
         {
@@ -65,7 +65,7 @@ namespace ORMapper.Models
                 throw new NotSupportedException("Member type not supported");
             }
         }
-        public object ToColumnType(object value)
+        public object ToColumnType(object value,List<object> localchache)
         {
             if (IsForeignKey)
             {
@@ -73,7 +73,9 @@ namespace ORMapper.Models
                 {
                     return null;
                 }
-                return Table._GetEntity().PrimaryKey.ToColumnType(Table._GetEntity().PrimaryKey.GetValue(value));
+                var i = value._GetEntity().PrimaryKey.ToColumnType(value._GetEntity().PrimaryKey.GetValue(value), localchache);
+                //localchache.Add(i);
+                return i;
             }
             if (Type == ColumnType)
             {
@@ -97,11 +99,11 @@ namespace ORMapper.Models
             return value;
         }
 
-        public object ToFieldType(object value) //,ICollection<object> localcache
+        public object ToFieldType(object value,ICollection<object> localcache) //,ICollection<object> localcache
         {
             if (IsForeignKey)
             {
-                return Orm._CreateObject(Type, value);
+                return Orm._CreateObject(Type, value,localcache);
             }
 
             if(Type == typeof(bool)){

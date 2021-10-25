@@ -1,59 +1,51 @@
-CREATE DATABASE cardgame ENCODING 'UTF-8';
-\c cardgame; 
+create database school encoding 'utf-8';
+\c school;
 
-Create table if not exists users
+
+CREATE TYPE Gender AS ENUM ('male','female');
+CREATE  TABLE TEACHERS
 (
-LoginName Varchar primary key,
-Passwort Varchar not null,
-UserName Varchar,
-bio Varchar,
-Image Varchar,
-Coins varchar default 20
+    ID            VARCHAR(24)        NOT NULL    PRIMARY KEY,
+    NAME         TEXT,
+    FIRSTNAME    TEXT,
+    GENDER        Gender,
+    BDATE        TIMESTAMP,
+    HDATE        TIMESTAMP,
+    SALARY        INTEGER
 );
-Create table if not exists Scoreboard(
-    LoginName_fk Varchar primary key,
-    win varchar default 0,
-    tie varchar default 0,
-    lose varchar default 0 ,
-    elo varchar default 100,
-    FOREIGN KEY(LoginName_fk) REFERENCES users(LoginName) ON DELETE CASCADE
-);
-Create table if not exists Card
+CREATE TABLE COURSES
 (
-    CardID Varchar primary key,
-    Cardtype Varchar,
-    CardName Varchar,
-    BaseDamage varchar,
-    CardElement Varchar,
-    CardStyle Varchar
+    ID            VARCHAR(24)    NOT NULL    PRIMARY KEY,
+    HACTIVE     INTEGER        NOT NULL     DEFAULT 0,
+    NAME         TEXT,
+    KTEACHER     VARCHAR(24)    NOT NULL    REFERENCES TEACHERS(ID)
 );
-Create table if not exists UserhasCardsinDeck(
-    CardId_fk varchar,
-    LoginName_fk varchar,
-    FOREIGN KEY(CardId_fk) REFERENCES Card(CardID) ON DELETE CASCADE,
-    FOREIGN KEY(LoginName_fk) REFERENCES users(LoginName) ON DELETE CASCADE,
-    PRIMARY KEY (CardId_fk,LoginName_fk)
-);
-Create table if not exists UserhasCardsinStack(
-    CardId_fk varchar,
-    LoginName_fk varchar,
-    CurrentlyTraded bool default false,
-    FOREIGN KEY(CardId_fk) REFERENCES Card(CardID) ON DELETE CASCADE,
-    FOREIGN KEY(LoginName_fk) REFERENCES users(LoginName) ON DELETE CASCADE,
-    PRIMARY KEY (CardId_fk,LoginName_fk)
-);
-Create table if not exists Packages
+CREATE TABLE CLASSES
 (
-    PackageId serial primary Key,
-    StringCards varchar
+    ID            VARCHAR(24)    NOT NULL    PRIMARY KEY,
+    NAME        TEXT,
+    KTEACHER    VARCHAR(24)    NOT NULL    REFERENCES TEACHERS(ID)
 );
-Create table if not exists Trading(
-    TradeID varchar primary key,
-    CardToTradeID_fk varchar unique,
-    OriginalOwner_fk varchar,
-    typeToTrade varchar,
-    minDamage varchar,
-    TimestampOffer timestamp default now(),
-    foreign key(CardToTradeID_fk) references Card(CardID),
-    foreign key(OriginalOwner_fk) references users(loginname)
+CREATE TABLE STUDENTS
+(
+    ID            VARCHAR(24)    NOT NULL    PRIMARY KEY,
+    NAME         TEXT,
+    FIRSTNAME    TEXT,
+    GENDER        Gender,
+    BDATE        TIMESTAMP,
+    KCLASS        VARCHAR(24)    REFERENCES CLASSES(ID),
+    GRADE        INTEGER
 );
+CREATE TABLE STUDENT_COURSES
+(
+    KSTUDENT VARCHAR(24) NOT NULL REFERENCES STUDENTS (ID),
+    KCOURSE  VARCHAR(24) NOT NULL REFERENCES COURSES (ID)
+);
+
+
+/*drop table STUDENT_COURSES;
+drop table STUDENTS;
+drop table CLASSES;
+drop table COURSES;
+drop table TEACHERS;
+drop type Gender;*/

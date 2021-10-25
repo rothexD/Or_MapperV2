@@ -1,4 +1,5 @@
 ﻿using System;
+using Newtonsoft.Json;
 using ORMapper;
 using ShowcaseOrm.Models;
 
@@ -12,7 +13,15 @@ namespace ShowcaseOrm.Show
         {
             Console.WriteLine("(3) Get All Objects of type");
             Console.WriteLine("--------------------------");
-            Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(Orm.GetAll<Teacher>()));
+            Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(Orm.GetAll<Teacher>(), 
+                Formatting.None, 
+                new JsonSerializerSettings()
+                {
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore 
+                }));
+        
+        
+                /**/
             Console.WriteLine("\n");
         }
     }

@@ -8,16 +8,25 @@ namespace ORMapper.FluentQuery
 {
     public class CustomQuery : ISelectParam, IFrom, ITable, IWhere, ITypeOfWhere,IConjunction
     {
-        private IDbCommand command = Orm.Connection.CreateCommand();
+        private IDbConnection con;
+        private IDbCommand command;
         private string Query { get; set; }
         private int counter = 0;
 
         private string _selectBlock = "";
+
+        private CustomQuery()
+        {
+            
+        }
         public static ISelectParam Select()
         {
-            CustomQuery query = new();
-            query.command.CommandText += "SELECT ";
-            return query;
+            var i =new CustomQuery();
+            i.con = Orm.Connection();
+            i.command = i.con.CreateCommand();
+            
+            i.command.CommandText += "SELECT ";
+            return i;
         }
 
         public IFrom SelectParam(string param)
