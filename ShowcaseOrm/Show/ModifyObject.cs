@@ -13,15 +13,15 @@ namespace ShowcaseOrm.Show
             Console.WriteLine("(2) Load and modify object");
             Console.WriteLine("--------------------------");
 
-            Teacher t = Orm.Get<Teacher>("t.0");
+            var t = Orm.Get<Teacher>("t.0");
 
             Console.WriteLine();
-            Console.WriteLine("Salary for " + t.FirstName + " " + t.Name + " is " + t.Salary.ToString() + " Pesos.");
+            Console.WriteLine("Salary for " + t.FirstName + " " + t.Name + " is " + t.Salary + " Pesos.");
 
             Console.WriteLine("Give rise of 12000.");
             t.Salary += 12000;
 
-            Console.WriteLine("Salary for " + t.FirstName + " " + t.Name + " is now " + t.Salary.ToString() + " Pesos.");
+            Console.WriteLine("Salary for " + t.FirstName + " " + t.Name + " is now " + t.Salary + " Pesos.");
 
             Orm.Save(t);
 

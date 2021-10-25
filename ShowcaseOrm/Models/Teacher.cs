@@ -6,7 +6,7 @@ namespace ShowcaseOrm.Models
 {
     /// <summary>This is a teacher implementation (from School example).</summary>
     [Table(TableName = "TEACHERS")]
-    public class Teacher: Person
+    public class Teacher : Person
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // public properties                                                                                                //
@@ -21,10 +21,8 @@ namespace ShowcaseOrm.Models
         public DateTime HireDate { get; set; }
 
 
-        [ForeignKey(ColumnName = "KTEACHER")] 
-        public List<Class> Classes { get; private set; } = new();
-        
-        [ForeignKey(ColumnName = "KTEACHER")] 
-        public List<Course> Courses { get; private set; } = new();
+        [ForeignKey(ColumnName = "KTEACHER")] public List<Class> Classes { get; set; } = new();
+
+        [ForeignKey(ColumnName = "KTEACHER")] public List<Course> Courses { get; set; } = new();
     }
 }

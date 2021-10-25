@@ -5,7 +5,7 @@ namespace ORMapper.FluentQuery
 {
     public static class Parameterhelper
     {
-        public static void ParaHelp(object key,object value,IDbCommand command)
+        public static void ParaHelp(object key, object value, IDbCommand command)
         {
             IDataParameter p = command.CreateParameter();
             p.ParameterName = key.ToString();

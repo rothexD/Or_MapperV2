@@ -1,10 +1,9 @@
-﻿using System.Collections.Generic;
-using ORMapper.Attributes;
+﻿using ORMapper.Attributes;
 
 namespace ShowcaseOrm.Models
 {
     /// <summary>This class represents a class in the school model.</summary>
-    [Table( TableName= "CLASSES")]
+    [Table(TableName = "CLASSES")]
     public class Class
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -22,10 +21,6 @@ namespace ShowcaseOrm.Models
 
         /// <summary>Gets or sets the class teacher.</summary>
         [ForeignKey(ColumnName = "KTEACHER")]
-        public Teacher Teacher
-        {
-            get; set;
-        }
-
+        public Teacher Teacher { get; set; }
     }
 }

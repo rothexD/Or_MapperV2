@@ -1,10 +1,11 @@
-﻿using ORMapper.Attributes;
+﻿using System.Collections.Generic;
+using ORMapper.Attributes;
 
 namespace ShowcaseOrm.Models
 {
     /// <summary>This is a student implementation (from School example).</summary>
     [Table(TableName = "STUDENTS")]
-    public class Student: Person
+    public class Student : Person
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // public properties                                                                                                //
@@ -12,5 +13,8 @@ namespace ShowcaseOrm.Models
 
         /// <summary>Gets or sets the student's grade.</summary>
         public int Grade { get; set; }
+        
+        [ForeignKey(RemoteTableName = typeof(STUDENT_COURSES), ColumnName = "kstudent", MyReferenceToThisColumnName = "kstudent", TheirReferenceToThisColumnName = "kcourse",isManyToMany = true)]
+        public List<Course> Course { get; set; } = new();
     }
 }

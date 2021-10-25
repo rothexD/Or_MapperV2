@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using Npgsql;
 using ORMapper.FluentQuery;
 using ORMapper.Models;
@@ -41,12 +42,12 @@ namespace ORMapper
         }
 
 
-        internal static object _CreateObject(Type t, IDataReader reader, ICollection<object> localcache)
+        internal static object _CreateObject(Type t, IDataReader reader, ICollection<object> localcache, bool caching = true)
         {
-            var returnObject = Searchcache(t,
+            var returnObject = caching ? Searchcache(t,
                 t._GetEntity().PrimaryKey
                     .ToFieldType(reader.GetValue(reader.GetOrdinal(t._GetEntity().PrimaryKey.ColumnName)), localcache),
-                localcache);
+                localcache) : null ;
 
             if (returnObject == null)
             {
@@ -57,22 +58,41 @@ namespace ORMapper
             foreach (var i in t._GetEntity().Internals)
                 i.SetValue(returnObject, i.ToFieldType(reader.GetValue(reader.GetOrdinal(i.ColumnName)), localcache));
 
+
             foreach (var i in t._GetEntity().Externals)
             {
                 var list = Activator.CreateInstance(i.Type) as IList;
-                if (i.IsExternal)
+                if (i.IsExternal && !i.IsManyToMany)
                 {
-                    var value = _CreateObjectAll(i.Type.GetGenericArguments()[0], localcache, i.Table.PrimaryKey.GetValue(returnObject),i.ColumnName) as IList;
+                    var value = _CreateObjectAll(i.Type.GetGenericArguments()[0], localcache,
+                        i.Table.PrimaryKey.GetValue(returnObject), i.ColumnName) as IList;
                     i.SetValue(returnObject, value);
+                }
+
+                if (i.IsExternal && i.IsManyToMany)
+                {
+                    var reflist = _CreateObjectAll(i.RemoteTable, localcache,
+                        i.Table.PrimaryKey.GetValue(returnObject), i.MyReferenceToThisColumnName,false);
+
+                    var valueList = Activator.CreateInstance(i.ColumnType) as IList;
+
+                    foreach (var o in reflist as IList)
+                    {
+                        var key = o._GetEntity().Columns.First(x => x.ColumnName.ToLower() == i.TheirReferenceToThisColumnName.ToLower());
+                        var pk = key.GetValue(o);
+                        valueList.Add(_CreateObject(i.ColumnType.GetGenericArguments()[0], pk, localcache));
+                    }
+
+                    i.SetValue(returnObject, valueList);
                 }
             }
 
             return returnObject;
         }
 
-        internal static object _CreateObject(Type t, object pk, ICollection<object> localcache)
+        internal static object _CreateObject(Type t, object pk, ICollection<object> localcache, bool caching = true)
         {
-            var returnObject = Searchcache(t, pk, localcache);
+            var returnObject = caching ? Searchcache(t, pk, localcache) : null;
             if (returnObject != null) return returnObject;
 
             var con = Connection();
@@ -91,24 +111,23 @@ namespace ORMapper
             reader.Dispose();
             command.Dispose();
 
-            if (returnObject == null) throw new Exception("no data.");
+            //if (returnObject == null) throw new Exception("no data.");
 
             con.CloseCustom();
             return returnObject;
         }
 
-        private static object _CreateObjectAll(Type t, ICollection<object> localcache, object pk,string foreignkeytablename)
+        private static object _CreateObjectAll(Type t, ICollection<object> localcache, object pk,
+            string foreignkeytablename, bool caching = true)
         {
             var con = Connection();
             con.CustomOpen();
             var command = con.CreateCommand();
 
-            Console.WriteLine(pk);
             command.CommandText = pk == null
                 ? t._GetEntity().GetSelectSQL(null)
                 : t._GetEntity().GetSelectSQL(null) + " Where " + foreignkeytablename + " = :pk";
-            
-            Console.WriteLine(command.CommandText);
+
 
             Parameterhelper.ParaHelp(":pk", pk, command);
             var reader = command.ExecuteReader();
@@ -119,9 +138,9 @@ namespace ORMapper
             var objectlist = Activator.CreateInstance(constructedListType) as IList;
 
 
-            while (reader.Read()) objectlist.Add(_CreateObject(t, reader, localcache));
-            
-            
+            while (reader.Read()) objectlist.Add(_CreateObject(t, reader, localcache,caching));
+
+
             reader.Close();
             reader.Dispose();
             command.Dispose();
@@ -132,19 +151,13 @@ namespace ORMapper
         public static void Save(object o)
         {
             if (o is IEnumerable)
-            {
                 foreach (var x in o as IEnumerable)
-                {
-                    SaveInternal(x,new List<object>());
-                }
-            }
+                    SaveInternal(x, new List<object>());
             else
-            {
                 SaveInternal(o, new List<object>());
-            }
         }
 
-        internal static void SaveInternal(object o, List<object> localcache)
+        internal static void SaveInternal(object o, List<object> localcache, bool caching = true)
         {
             var ent = o._GetEntity();
             var first = true;
@@ -203,11 +216,13 @@ namespace ORMapper
             con.CloseCustom();
 
             for (var i = 0; i < ent.Externals.Length; i++)
+            {
                 foreach (var x in ent.Externals[i].GetValue(o) as IEnumerable)
                 {
                     SaveInternal(x, localcache);
                     localcache.Add(x);
                 }
+            }
         }
 
 
@@ -218,7 +233,8 @@ namespace ORMapper
 
         public static List<T> GetAll<T>(object pk = null)
         {
-            return (List<T>) _CreateObjectAll(typeof(T), new List<object>(), pk,typeof(T)._GetEntity().PrimaryKey.ColumnName);
+            return (List<T>) _CreateObjectAll(typeof(T), new List<object>(), pk,
+                typeof(T)._GetEntity().PrimaryKey.ColumnName);
         }
 
         public static void Delete<T>(object pk)

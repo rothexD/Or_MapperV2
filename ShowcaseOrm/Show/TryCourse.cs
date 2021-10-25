@@ -11,7 +11,7 @@ public static class TryCourse
         Console.WriteLine("(4) Insert object");
         Console.WriteLine("-----------------");
 
-        Teacher t = new Teacher();
+        var t = new Teacher();
 
         t.ID = "t.Course";
         t.FirstName = "Pery";
@@ -21,25 +21,25 @@ public static class TryCourse
         t.HireDate = new DateTime(2015, 6, 20);
         t.Salary = 600;
 
-        var course = new Course()
+        var course = new Course
         {
             ID = "course2",
             Name = "course",
             Teacher = t
         };
         Orm.Save(course);
-        
-        Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(Orm.Get<Course>("course"), 
-            Formatting.None, 
-            new JsonSerializerSettings()
+
+        Console.WriteLine(JsonConvert.SerializeObject(Orm.Get<Course>("course"),
+            Formatting.None,
+            new JsonSerializerSettings
             {
-                ReferenceLoopHandling = ReferenceLoopHandling.Ignore 
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
             }));
-        Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(Orm.Get<Teacher>("t.Course"), 
-            Formatting.None, 
-            new JsonSerializerSettings()
+        Console.WriteLine(JsonConvert.SerializeObject(Orm.Get<Teacher>("t.Course"),
+            Formatting.None,
+            new JsonSerializerSettings
             {
-                ReferenceLoopHandling = ReferenceLoopHandling.Ignore 
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
             }));
 
         foreach (var VARIABLE in Orm.Get<Teacher>("t.Course").Courses)
@@ -47,8 +47,8 @@ public static class TryCourse
             Console.WriteLine("one course");
             Console.WriteLine(VARIABLE.Name);
             Console.WriteLine(VARIABLE.ID);
-            
         }
+
         Console.WriteLine("\n");
     }
 }

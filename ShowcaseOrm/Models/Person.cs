@@ -1,7 +1,6 @@
 ﻿using System;
 using ORMapper.Attributes;
 
-
 namespace ShowcaseOrm.Models
 {
     /// <summary>This is a person implementation (from School example).</summary>
@@ -13,7 +12,6 @@ namespace ShowcaseOrm.Models
 
         /// <summary>Instance number counter.</summary>
         protected static int _N = 1;
-
 
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -48,9 +46,8 @@ namespace ShowcaseOrm.Models
     }
 
 
-
     /// <summary>This enumeration defines genders.</summary>
-    public enum Gender: int
+    public enum Gender
     {
         female = 0,
         male = 1

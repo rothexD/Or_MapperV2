@@ -1,141 +1,141 @@
 ﻿using System;
 using System.Data;
-using System.Reflection.Metadata;
 using ORMapper.FluentQuery.IFluentSqlInterfaces;
-using ORMapper.Models;
 
-namespace ORMapper.FluentQuery 
+namespace ORMapper.FluentQuery
 {
-    public class CustomQuery : ISelectParam, IFrom, ITable, IWhere, ITypeOfWhere,IConjunction
+    public class CustomQuery : ISelectParam, IFrom, ITable, IWhere, ITypeOfWhere, IConjunction
     {
-        private IDbConnection con;
-        private IDbCommand command;
-        private string Query { get; set; }
-        private int counter = 0;
-
         private string _selectBlock = "";
+        private IDbConnection con;
+        private int counter;
 
         private CustomQuery()
         {
-            
-        }
-        public static ISelectParam Select()
-        {
-            var i =new CustomQuery();
-            i.con = Orm.Connection();
-            i.command = i.con.CreateCommand();
-            
-            i.command.CommandText += "SELECT ";
-            return i;
         }
 
-        public IFrom SelectParam(string param)
+        private string Query { get; set; }
+
+        public ITypeOfWhere And()
         {
-            IDataParameter par = command.CreateParameter();
-            par.ParameterName = " :w" + counter.ToString();
-            par.Value = param;
-            _selectBlock += " :w" + counter.ToString()+", ";
-            counter++;
+            getCommand.CommandText += " and ";
+            return this;
+        }
+
+        public ITypeOfWhere Or()
+        {
+            getCommand.CommandText += " or ";
             return this;
         }
 
         public ITable From()
         {
-            string selectblock = _selectBlock.Trim().Trim(',');
-            
-            command.CommandText += selectblock;
+            var selectblock = _selectBlock.Trim().Trim(',');
 
+            getCommand.CommandText += selectblock;
+
+            return this;
+        }
+
+        public IFrom SelectParam(string param)
+        {
+            IDataParameter par = getCommand.CreateParameter();
+            par.ParameterName = " :w" + counter;
+            par.Value = param;
+            _selectBlock += " :w" + counter + ", ";
+            counter++;
             return this;
         }
 
         public IWhere Table(Type table)
         {
-            string tablename = table._GetEntity().TableName;
-            command.CommandText += " " + tablename + "" ;
+            var tablename = table._GetEntity().TableName;
+            getCommand.CommandText += " " + tablename + "";
             return this;
         }
-        public ITypeOfWhere Where()
-        {
-            command.CommandText += " Where " ;
-            return this;
-        }
-        
-        public IConjunction EqualsDb<T,C>((T first,C second) tupel)
+
+        public IDbCommand getCommand { get; private set; }
+
+        public IConjunction EqualsDb<T, C>((T first, C second) tupel)
         {
             TypeOfWhereHelper(tupel, "=");
-            
+
             return this;
         }
-        public IConjunction NotEquals<T,C>((T first,C second) tupel)
+
+        public IConjunction NotEquals<T, C>((T first, C second) tupel)
         {
             TypeOfWhereHelper(tupel, "!=");
             return this;
         }
-        public IConjunction Like<T,C>((T first,C second) tupel)
+
+        public IConjunction Like<T, C>((T first, C second) tupel)
         {
             TypeOfWhereHelper(tupel, "like");
             return this;
         }
-        public IConjunction Smaller<T,C>((T first,C second) tupel)
+
+        public IConjunction Smaller<T, C>((T first, C second) tupel)
         {
             TypeOfWhereHelper(tupel, "<");
             return this;
         }
-        public IConjunction Greater<T,C>((T first,C second) tupel)
+
+        public IConjunction Greater<T, C>((T first, C second) tupel)
         {
             TypeOfWhereHelper(tupel, ">");
-            
+
             return this;
         }
-        public IConjunction SmallerEquals<T,C>((T first,C second) tupel)
+
+        public IConjunction SmallerEquals<T, C>((T first, C second) tupel)
         {
             TypeOfWhereHelper(tupel, "<=");
             return this;
         }
-        public IConjunction GreaterEquals<T,C>((T first,C second) tupel)
+
+        public IConjunction GreaterEquals<T, C>((T first, C second) tupel)
         {
             TypeOfWhereHelper(tupel, ">");
-            
+
             return this;
         }
 
-        public ITypeOfWhere And()
+        public ITypeOfWhere Where()
         {
-            command.CommandText += " and ";
+            getCommand.CommandText += " Where ";
             return this;
         }
-        public ITypeOfWhere Or()
+
+        public static ISelectParam Select()
         {
-            command.CommandText += " or ";
-            return this;
+            var i = new CustomQuery();
+            i.con = Orm.Connection();
+            i.getCommand = i.con.CreateCommand();
+
+            i.getCommand.CommandText += "SELECT ";
+            return i;
         }
+
         private void TypeOfWhereHelper<T, C>((T first, C second) tupel, string insert)
         {
-            string par1name = ":w" + counter.ToString();
+            var par1name = ":w" + counter;
             counter++;
-            string par2name = ":w" + counter.ToString();
+            var par2name = ":w" + counter;
             counter++;
-            
-            IDataParameter par1 = command.CreateParameter();
+
+            IDataParameter par1 = getCommand.CreateParameter();
             par1.ParameterName = par1name;
             par1.Value = tupel.first;
-            
-            IDataParameter par2 = command.CreateParameter();
+
+            IDataParameter par2 = getCommand.CreateParameter();
             par2.ParameterName = par2name;
             par2.Value = tupel.second;
 
-            command.Parameters.Add(par1);
-            command.Parameters.Add(par2);
+            getCommand.Parameters.Add(par1);
+            getCommand.Parameters.Add(par2);
 
-            command.CommandText += " "+ par1name + " " +insert+" " + " :w" + par2name + " ";
-        }
-
-        public IDbCommand getCommand
-        {
-            get
-            {
-                return command;
-            }
+            getCommand.CommandText += " " + par1name + " " + insert + " " + " :w" + par2name + " ";
         }
     }
 }

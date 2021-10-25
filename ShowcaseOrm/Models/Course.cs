@@ -1,4 +1,5 @@
-﻿using ORMapper.Attributes;
+﻿using System.Collections.Generic;
+using ORMapper.Attributes;
 
 namespace ShowcaseOrm.Models
 {
@@ -22,5 +23,8 @@ namespace ShowcaseOrm.Models
         /// <summary>Gets or sets the course teacher.</summary>
         [ForeignKey(ColumnName = "KTEACHER")]
         public Teacher Teacher { get; set; }
+
+        [ForeignKey(RemoteTableName = typeof(STUDENT_COURSES), ColumnName = "KCOURSE",  MyReferenceToThisColumnName = "kcourse", TheirReferenceToThisColumnName = "kstudent",isManyToMany = true)]
+        public List<Student> Students { get; set; } = new();
     }
 }

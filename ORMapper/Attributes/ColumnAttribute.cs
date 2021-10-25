@@ -8,6 +8,5 @@ namespace ORMapper.Attributes
         public string ColumnName = null;
         public Type ColumnType = null;
         public bool Nullable = false;
-
     }
 }

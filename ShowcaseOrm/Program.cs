@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Data;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Threading;
-using Npgsql;
 using ORMapper;
 using ORMapper.Models;
 using ShowcaseOrm.Models;
@@ -9,13 +9,26 @@ using ShowcaseOrm.Show;
 
 namespace ShowcaseOrm
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             Orm.Connectionstring = "Server=127.0.0.1;Port=5438;Database=school;User Id=postgres;Password=postgres;";
-           
-            /*Console.WriteLine(counter.counterI);
+
+            List<Type> tables = new();
+            List<Type> enums = new();
+            enums.Add(typeof(Gender));
+            tables.Add(typeof(Course));
+            tables.Add(typeof(Student));
+            tables.Add(typeof(STUDENT_COURSES));
+            tables.Add(typeof(Class));
+            tables.Add(typeof(Teacher));
+
+            OrmMapping.Map(tables.ToArray(),enums.ToArray());
+            
+            
+            //GetStudent.Show();
+            Console.WriteLine(counter.counterI);
             InsertModifyShouldsave.Show();
             Thread.Sleep(1000);
             Console.WriteLine(counter.counterI);
@@ -24,15 +37,14 @@ namespace ShowcaseOrm
             Console.WriteLine(counter.counterI);
             ModifyObject.Show();
             Thread.Sleep(1000);
-            Console.WriteLine(counter.counterI);*/
+            Console.WriteLine(counter.counterI);
             GetAllObjets.Show();
-            /*Thread.Sleep(1000);
+            Thread.Sleep(1000);
             Console.WriteLine(counter.counterI);
             TryCourse.Show();
             Thread.Sleep(1000);
             Console.WriteLine(counter.counterI);
-            insertClass.Show();*/
-            
+            insertClass.Show();
         }
     }
 }
