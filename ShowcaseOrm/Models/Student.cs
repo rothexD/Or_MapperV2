@@ -14,7 +14,7 @@ namespace ShowcaseOrm.Models
         /// <summary>Gets or sets the student's grade.</summary>
         public int Grade { get; set; }
         
-        [ForeignKey(RemoteTableName = typeof(STUDENT_COURSES), ColumnName = "kstudent", MyReferenceToThisColumnName = "kstudent", TheirReferenceToThisColumnName = "kcourse",isManyToMany = true)]
+        [ForeignKey(RemoteTableName = typeof(STUDENT_COURSES), ColumnName = "kstudent", TheirReferenceToThisColumnName = "kcourse")]
         public List<Course> Course { get; set; } = new();
     }
 }

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Transactions;
 using Npgsql;
 using ORMapper.FluentQuery;
 using ORMapper.Models;
@@ -15,22 +16,19 @@ namespace ORMapper
         public static string Connectionstring = "";
 
         /// <summary>
-        /// creates a new connection
+        ///     creates a new connection
         /// </summary>
         /// <returns>returns a new connection</returns>
-        public static IDbConnection Connection()
+        public static NpgsqlConnection Connection()
         {
             return new NpgsqlConnection(Connectionstring);
-            ;
         }
+
         /// <summary>
-        /// gets the table Entity for a given object by referencing its Type
-        ///
-        /// (Class)._GetTable = Enitiy of class
-        ///
-        /// Internal Storage in a Dictionary (Type,Table)
-        ///
-        /// if Enitity does not exist in dictionary, create a new one and add to dictionary
+        ///     gets the table Entity for a given object by referencing its Type
+        ///     (Class)._GetTable = Enitiy of class
+        ///     Internal Storage in a Dictionary (Type,Table)
+        ///     if Enitity does not exist in dictionary, create a new one and add to dictionary
         /// </summary>
         /// <param name="o">object whos Enitity should be returned</param>
         /// <returns>a mapped Entity</returns>
@@ -41,14 +39,15 @@ namespace ORMapper
             if (!_mappedEntities.ContainsKey(t)) _mappedEntities.Add(t, new Table(t));
             return _mappedEntities[t];
         }
+
         /// <summary>
-        /// searches in a localcache for a object that matches it
+        ///     searches in a localcache for a object that matches it
         /// </summary>
         /// <param name="findObjectOfType">tries to find a object of this type</param>
         /// <param name="pk">the primary key that identifies the object</param>
         /// <param name="localcache">a localcache</param>
         /// <returns>null if not in cache, object if in cache</returns>
-        internal static object SearchIncache(Type findObjectOfType, object pk, ICollection<object> localcache)
+        public static object SearchInCache(Type findObjectOfType, object pk, ICollection<object> localcache)
         {
             if (localcache == null) return null;
             foreach (var i in localcache)
@@ -62,19 +61,23 @@ namespace ORMapper
         }
 
         /// <summary>
-        /// Creates a table object that represents an entry
+        ///     Creates a table object that represents an entry
         /// </summary>
         /// <param name="t">create a table object which should be created</param>
         /// <param name="reader">A Datareader with data to fill the objet</param>
         /// <param name="localcache"></param>
         /// <param name="shouldMethodUseCaching">should this method use caching, by default true</param>
         /// <returns>a column object</returns>
-        internal static object _CreateObject(Type t, IDataReader reader, ICollection<object> localcache, bool shouldMethodUseCaching = true)
+        internal static object _CreateObject(Type t, IDataReader reader, ICollection<object> localcache,
+            bool shouldMethodUseCaching = true)
         {
-            var returnObject = shouldMethodUseCaching ? SearchIncache(t,
-                t._GetTable().PrimaryKey
-                    .ToFieldType(reader.GetValue(reader.GetOrdinal(t._GetTable().PrimaryKey.ColumnName)), localcache),
-                localcache) : null ;
+            var returnObject = shouldMethodUseCaching
+                ? SearchInCache(t,
+                    t._GetTable().PrimaryKey
+                        .ToFieldType(reader.GetValue(reader.GetOrdinal(t._GetTable().PrimaryKey.ColumnName)),
+                            localcache),
+                    localcache)
+                : null;
 
             if (returnObject == null)
             {
@@ -99,13 +102,14 @@ namespace ORMapper
                 if (i.IsExternal && i.IsManyToMany)
                 {
                     var referencesFromNtoMTable = _CreateObjectAll(i.RemoteTable, localcache,
-                        i.Table.PrimaryKey.GetValue(returnObject), i.MyReferenceToThisColumnName,false);
+                        i.Table.PrimaryKey.GetValue(returnObject), i.ColumnName, false);
 
                     var returnList = Activator.CreateInstance(i.ColumnType) as IList;
 
                     foreach (var o in referencesFromNtoMTable as IList)
                     {
-                        var key = o._GetTable().Columns.First(x => x.ColumnName.ToLower() == i.TheirReferenceToThisColumnName.ToLower());
+                        var key = o._GetTable().Columns.First(x =>
+                            x.ColumnName.ToLower() == i.TheirReferenceToThisColumnName.ToLower());
                         var pk = key.GetValue(o);
                         returnList.Add(_CreateObject(i.ColumnType.GetGenericArguments()[0], pk, localcache));
                     }
@@ -116,17 +120,19 @@ namespace ORMapper
 
             return returnObject;
         }
+
         /// <summary>
-        /// creates a table entry object for a given primary key
+        ///     creates a table entry object for a given primary key
         /// </summary>
         /// <param name="t">creates table of type</param>
         /// <param name="pk"></param>
         /// <param name="localcache"></param>
         /// <param name="shouldMethodUseCaching">should this method use caching</param>
         /// <returns>returns a table entry</returns>
-        internal static object _CreateObject(Type t, object pk, ICollection<object> localcache, bool shouldMethodUseCaching = true)
+        internal static object _CreateObject(Type t, object pk, ICollection<object> localcache,
+            bool shouldMethodUseCaching = true)
         {
-            var returnObject = shouldMethodUseCaching ? SearchIncache(t, pk, localcache) : null;
+            var returnObject = shouldMethodUseCaching ? SearchInCache(t, pk, localcache) : null;
             if (returnObject != null) return returnObject;
 
             var con = Connection();
@@ -150,8 +156,9 @@ namespace ORMapper
             con.CloseCustom();
             return returnObject;
         }
+
         /// <summary>
-        /// gets all objects that match a primary key
+        ///     gets all objects that match a primary key
         /// </summary>
         /// <param name="t">which type of table should be created</param>
         /// <param name="localcache"></param>
@@ -179,7 +186,7 @@ namespace ORMapper
             var objectlist = Activator.CreateInstance(constructedListType) as IList;
 
 
-            while (reader.Read()) objectlist.Add(_CreateObject(t, reader, localcache,shouldMethodUseCaching));
+            while (reader.Read()) objectlist.Add(_CreateObject(t, reader, localcache, shouldMethodUseCaching));
 
 
             reader.Close();
@@ -188,21 +195,35 @@ namespace ORMapper
             con.CloseCustom();
             return objectlist;
         }
+
         /// <summary>
-        /// public interface for save to db function
+        ///     public interface for save to db function
         /// </summary>
         /// <param name="o">object which should be stored to db</param>
         public static void Save(object o)
         {
-            
-            if (o is IEnumerable)
-                foreach (var x in o as IEnumerable)
-                    SaveInternal(x, new List<object>());
-            else
-                SaveInternal(o, new List<object>());
+            try
+            {
+                using (var scope = new TransactionScope())
+                {
+                    if (o is IEnumerable)
+                        foreach (var x in o as IEnumerable)
+                            SaveInternal(x, new List<object>());
+                    else
+                        SaveInternal(o, new List<object>());
+                    
+                    scope.Complete();
+                }
+            }
+            catch (TransactionAbortedException e)
+            {
+                Console.WriteLine("Transaction aborted in Get: " + e.Message);
+                throw;
+            }
         }
+
         /// <summary>
-        /// saves to object todaterbase
+        ///     saves to object todaterbase
         /// </summary>
         /// <param name="o">which object(table entry)</param>
         /// <param name="localcache"></param>
@@ -213,8 +234,11 @@ namespace ORMapper
             var first = true;
             if (o == null) return;
 
-            if (SearchIncache(o.GetType(), o._GetTable().PrimaryKey.GetValue(o), localcache) != null) return;
-            localcache.Add(o);
+            if (caching && SearchInCache(o.GetType(), o._GetTable().PrimaryKey.GetValue(o), localcache) != null) return;
+            if (caching)
+            {
+                localcache.Add(o);
+            }
 
             var con = Connection();
 
@@ -235,7 +259,10 @@ namespace ORMapper
                 if (ent.Internals[i].IsForeignKey)
                 {
                     SaveInternal(ent.Internals[i].GetValue(o), localcache);
-                    localcache.Add(ent.Internals[i].GetValue(o));
+                    if (caching)
+                    {
+                        localcache.Add(ent.Internals[i].GetValue(o));
+                    }
                 }
 
 
@@ -266,42 +293,69 @@ namespace ORMapper
             con.CloseCustom();
 
             for (var i = 0; i < ent.Externals.Length; i++)
-            {
                 foreach (var x in ent.Externals[i].GetValue(o) as IEnumerable)
                 {
                     SaveInternal(x, localcache);
                     localcache.Add(x);
                 }
-            }
         }
 
         /// <summary>
-        /// public interface for get (gets a single table entry where pk == pk)
+        ///     public interface for get (gets a single table entry where pk == pk)
         /// </summary>
         /// <param name="pk">primary key</param>
         /// <typeparam name="T">tabl</typeparam>
         /// <returns></returns>
         public static T Get<T>(object pk)
         {
-            return (T) _CreateObject(typeof(T), pk, new List<object>());
+            try
+            {
+                using (var scope = new TransactionScope())
+                {
+                    var returnVal = (T) _CreateObject(typeof(T), pk, new List<object>());
+                    scope.Complete();
+                    return returnVal;
+                }
+            }
+            catch (TransactionAbortedException e)
+            {
+                Console.WriteLine("Transaction aborted in Get: " + e.Message);
+                throw;
+            }
         }
+
         /// <summary>
-        /// public interface for getall (get all tableentries where pk == pk)
+        ///     public interface for GetAll (get all table entries where pk == pk)
         /// </summary>
         /// <param name="pk"></param>
         /// <typeparam name="T">table</typeparam>
         /// <returns></returns>
         public static List<T> GetAll<T>(object pk = null)
         {
-            return (List<T>) _CreateObjectAll(typeof(T), new List<object>(), pk,
-                typeof(T)._GetTable().PrimaryKey.ColumnName);
+            try
+            {
+                using (var scope = new TransactionScope())
+                {
+                    var returnVal = (List<T>) _CreateObjectAll(typeof(T), new List<object>(), pk,
+                        typeof(T)._GetTable().PrimaryKey.ColumnName);
+                    scope.Complete();
+                    return returnVal;
+                }
+            }
+            catch (TransactionAbortedException e)
+            {
+                Console.WriteLine("Transaction aborted in GetAll: " + e.Message);
+                throw;
+            }
         }
+
+
         /// <summary>
-        /// delete a single table entry from db
+        ///     delete a single table entry from db
         /// </summary>
         /// <param name="pk">primary key</param>
-        /// <typeparam name="T">table</typeparam>
-        public static void Delete<T>(object pk)
+        /// <typeparam name="t">table</typeparam>
+        internal static void Delete(Type t, object pk)
         {
             var con = Connection();
             con.CustomOpen();
@@ -309,13 +363,36 @@ namespace ORMapper
 
 
             command.CommandText =
-                $"Delete from {typeof(T)._GetTable().TableName} where {typeof(T)._GetTable().PrimaryKey.ColumnName} = :pk";
+                $"Delete from {t._GetTable().TableName} where {t._GetTable().PrimaryKey.ColumnName} = :pk";
 
             Parameterhelper.ParaHelp(":pk", pk, command);
 
             command.ExecuteNonQuery();
             command.Dispose();
             con.CloseCustom();
+        }
+
+
+        /// <summary>
+        ///     calls internal delete and defines transaction
+        /// </summary>
+        /// <param name="pk">primary key</param>
+        /// <typeparam name="T">table</typeparam>
+        public static void Delete<T>(object pk)
+        {
+            try
+            {
+                using (var scope = new TransactionScope())
+                {
+                    Delete(typeof(T), pk);
+                    scope.Complete();
+                }
+            }
+            catch (TransactionAbortedException e)
+            {
+                Console.WriteLine("Transaction aborted in Delete: " + e.Message);
+                throw;
+            }
         }
     }
 }

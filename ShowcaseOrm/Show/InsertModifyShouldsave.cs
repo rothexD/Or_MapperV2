@@ -20,7 +20,16 @@ namespace ShowcaseOrm.Show
             t.HireDate = new DateTime(2015, 6, 20);
             t.Salary = 600;
             Orm.Save(t);
+            
+            var t2 = new Teacher();
 
+            t2.ID = "mechaniker2";
+            t2.FirstName = "Mechy";
+            t2.Name = "test";
+            t2.Gender = Gender.male;
+            t2.BirthDate = new DateTime(1970, 8, 18);
+            t2.HireDate = new DateTime(2015, 6, 20);
+            t2.Salary = 600;
 
             Orm.Save(new Course
             {
@@ -33,7 +42,7 @@ namespace ShowcaseOrm.Show
             {
                 ID = "mechanik",
                 Name = "mechanik",
-                Teacher = t
+                Teacher = t2
             });
 
             Console.WriteLine("before get");

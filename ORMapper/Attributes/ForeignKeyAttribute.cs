@@ -15,15 +15,13 @@ namespace ORMapper.Attributes
     /// public List<T> Classes { get; set; } = new();
     ///
     /// For n:m usage:
-    /// [ForeignKey(RemoteTableName = typeof(STUDENT_COURSES), ColumnName = "course", MyReferenceToThisColumnName = "kstudent", TheirReferenceToThisColumnName = "kcourse",isManyToMany = true)]
+    /// [ForeignKey(RemoteTableName = typeof(STUDENT_COURSES), ColumnName = "course", TheirReferenceToThisColumnName = "kcourse")]
     /// public List<T> Course { get; set; } = new();
     /// </summary>
     [AttributeUsage(AttributeTargets.Property)]
     public class ForeignKeyAttribute : ColumnAttribute
     {
-        public string MyReferenceToThisColumnName = null;
         public string TheirReferenceToThisColumnName = null;
         public Type RemoteTableName = null;
-        public bool isManyToMany = false;
     }
 }

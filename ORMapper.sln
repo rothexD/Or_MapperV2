@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ORMapper", "ORMapper\ORMapp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShowcaseOrm", "ShowcaseOrm\ShowcaseOrm.csproj", "{EEB2099D-7DC7-4427-B14C-164BDE47C640}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrMapper.Tests", "OrMapper.Tests\OrMapper.Tests.csproj", "{33BADEE8-0DF3-4D88-BE62-C666C3C2C686}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{EEB2099D-7DC7-4427-B14C-164BDE47C640}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EEB2099D-7DC7-4427-B14C-164BDE47C640}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EEB2099D-7DC7-4427-B14C-164BDE47C640}.Release|Any CPU.Build.0 = Release|Any CPU
+		{33BADEE8-0DF3-4D88-BE62-C666C3C2C686}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{33BADEE8-0DF3-4D88-BE62-C666C3C2C686}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{33BADEE8-0DF3-4D88-BE62-C666C3C2C686}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{33BADEE8-0DF3-4D88-BE62-C666C3C2C686}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

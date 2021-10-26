@@ -47,10 +47,6 @@ namespace ORMapper.Models
         public Type RemoteTable { get; internal set; }
         
         /// <summary>
-        /// Columname that is referenced by me for n:m
-        /// </summary>
-        public string MyReferenceToThisColumnName { get; internal set; }
-        /// <summary>
         /// Columname that is referenced by them for n:m
         /// </summary>
         public string TheirReferenceToThisColumnName { get; internal set; }
@@ -82,7 +78,7 @@ namespace ORMapper.Models
                 throw new NotSupportedException("Member type not supported");
         }
         /// <summary>
-        /// transfers a object to a different columntype, uses caching by default
+        /// transfers a object to the columntype, uses caching by default
         /// </summary>
         /// <param name="value">value to be trasnformed</param>
         /// <param name="localchache">cache in which objects can be stored and searched for</param>
