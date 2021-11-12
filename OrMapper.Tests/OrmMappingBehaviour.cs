@@ -111,7 +111,7 @@ namespace OrMapper.Tests
             OrmMapping.ParseEnums(results,enumArray);
 
             results.Should().HaveCount(1);
-            results.Should().Contain("Create Type MyTestEnum as enum ('Test','Cookie');");
+            results.Should().Contain("DO $$ BEGIN  CREATE TYPE MyTestEnum AS Enum ('Test','Cookie');  EXCEPTION  WHEN duplicate_object THEN null;  END $$;");
         }
     }
 }

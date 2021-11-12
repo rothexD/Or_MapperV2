@@ -9,5 +9,6 @@ namespace ORMapper.Attributes
     public class TableAttribute : Attribute
     {
         public string TableName = "";
+        public bool isManyToManyTable = false;
     }
 }

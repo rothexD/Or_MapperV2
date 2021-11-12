@@ -128,9 +128,9 @@ namespace ORMapper.Models
                 if (value is long) return (int) value != 0;
             }
 
-            if (Type == typeof(int)) return Convert.ToInt16(value);
+            if (Type == typeof(int)) return Convert.ToInt32(value);
             if (Type == typeof(short)) return Convert.ToInt16(value);
-            if (Type == typeof(long)) return Convert.ToInt16(value);
+            if (Type == typeof(long)) return Convert.ToInt64(value);
 
             if (Type.IsEnum) return Enum.Parse(ColumnType, value.ToString());
             return value;

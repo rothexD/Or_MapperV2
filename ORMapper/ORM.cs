@@ -293,17 +293,26 @@ namespace ORMapper
                     foreach (var x in ent.Externals[i].GetValue(o) as IEnumerable)
                     {
                         SaveInternal(x, localcache);
+                        /*if (SearchInCache(x.GetType(), x._GetTable().PrimaryKey.GetValue(x), localcache) != null)
+                        {
+                            continue;
+                        }*/
                         
                         var con2 = Connection();
                         command = con2.CreateCommand();
                         command.CommandText = "insert into "
-                                              + ent.Externals[i].RemoteTable
-                                              + "(" + ent.Externals[i].ColumnName + "," +
-                                              ent.Externals[i].TheirReferenceToThisColumnName + ") values ("
-                                              + ent.PrimaryKey.GetValue(o) +","
-                                              + x._GetTable().PrimaryKey.GetValue(x)
-                                              + ");";
-                        Console.WriteLine(command.CommandText);
+                                              + ent.Externals[i].RemoteTable._GetTable().TableName
+                                              + "("+ent.Externals[i].TheirReferenceToThisColumnName + "," +
+                                              ent.Externals[i].ColumnName + ") values ("
+                                              + ":para1,:para2) ON CONFLICT ("+ent.Externals[i].TheirReferenceToThisColumnName+","+ent.Externals[i].ColumnName +") do nothing;";
+                        var z = x._GetTable().PrimaryKey.GetValue(x);
+                        command.Help(":para1",x._GetTable().PrimaryKey.GetValue(x));
+                        var y = ent.Externals[i].Table;
+                        var y2 = y.PrimaryKey;
+                        var y3 = y2.GetValue(o);
+                        
+                        command.Help(":para2",y3);
+                        con2.Open();
                         command.ExecuteNonQuery();
                         con2.Close();
                         con2.Dispose();
@@ -315,6 +324,7 @@ namespace ORMapper
                     foreach (var x in ent.Externals[i].GetValue(o) as IEnumerable)
                     {
                         SaveInternal(x, localcache);
+                        localcache.Add(x);
                     }
                 }
             }

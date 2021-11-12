@@ -26,6 +26,8 @@ namespace ShowcaseOrm.Show
             course.ID = "course.0";
             course.Teacher = teacher1to1;
             course.Students = new List<Student>();
+           
+            Orm.Save(course);
             
             var i = Orm.Get<Teacher>("t.0");
             Console.WriteLine("getting teacher only");

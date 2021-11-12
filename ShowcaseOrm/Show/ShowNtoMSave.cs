@@ -12,9 +12,9 @@ namespace ShowcaseOrm.Show
             
             
             var teacherExample = new Teacher();
-            teacherExample.ID = "t.0";
-            teacherExample.Name = "t.0 Name";
-            teacherExample.FirstName = "t.0 firstname";
+            teacherExample.ID = "t.2";
+            teacherExample.Name = "t.2 Name";
+            teacherExample.FirstName = "t.2 firstname";
             teacherExample.Gender = Gender.female;
             teacherExample.BirthDate = DateTime.Parse("11.01.1998");
             teacherExample.HireDate = DateTime.Parse("12.01.1998");
@@ -53,7 +53,7 @@ namespace ShowcaseOrm.Show
             student1.Course.Add(course2);
             Orm.Save(course);
             
-            var i = Orm.Get<Student>("t.1");
+            var i = Orm.Get<Student>("s.1");
             Console.WriteLine("printing student 1");
             Console.WriteLine(i.ID);
             Console.WriteLine(i.Name);
@@ -67,7 +67,7 @@ namespace ShowcaseOrm.Show
                 Console.WriteLine(iCourse.Name);
             }
             
-            var z = Orm.Get<Student>("t.2");
+            var z = Orm.Get<Student>("s.2");
             Console.WriteLine("printing student 2");
             Console.WriteLine(z.ID);
             Console.WriteLine(z.Name);
@@ -75,11 +75,21 @@ namespace ShowcaseOrm.Show
             Console.WriteLine(z.BirthDate);
             Console.WriteLine(z.Gender);
             Console.WriteLine(z.Grade);
-
+            Console.WriteLine("printing all courses for student 2");
+            foreach (var iCourse in i.Course)
+            {
+                Console.WriteLine(iCourse.Name);
+            }
             
             var y = Orm.Get<Course>("example many to many");
             Console.WriteLine("printing all students for course \"example many to many\"");
             foreach (var yStudent in y.Students)
+            {
+                Console.WriteLine(yStudent.ID);
+            }
+            var y2 = Orm.Get<Course>("example many to many2");
+            Console.WriteLine("printing all students for course \"example many to many2\"");
+            foreach (var yStudent in y2.Students)
             {
                 Console.WriteLine(yStudent.ID);
             }

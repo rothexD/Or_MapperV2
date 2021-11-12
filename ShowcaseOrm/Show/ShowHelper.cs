@@ -1,4 +1,5 @@
 ﻿using System;
+using Newtonsoft.Json;
 
 namespace ShowcaseOrm.Show
 {
@@ -20,6 +21,15 @@ namespace ShowcaseOrm.Show
             Console.WriteLine("----------------------------------------------------------------------------------------------");
             Console.WriteLine("----------------------------------------------------------------------------------------------");
             Console.WriteLine();
+        }
+
+        public static void printNewtonsoftJson(object o)
+        {
+            Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(o, Formatting.Indented, 
+                new JsonSerializerSettings 
+                { 
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                }));
         }
     }
 }

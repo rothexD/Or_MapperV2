@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Transactions;
 using Npgsql;
 using ORMapper.Attributes;
+using ORMapper.Models;
 
 namespace ORMapper
 {
@@ -82,12 +83,11 @@ namespace ORMapper
                 insert = insert.Trim(',');
                 if (string.IsNullOrWhiteSpace(insert)) continue;
                 string sql = "DO $$ BEGIN ";
-                sql += " CREATE TYPE my_type AS (" + insert +") ";
+                sql += " CREATE TYPE "+ i.Name +" AS Enum (" + insert +"); ";
                     
                 sql += " EXCEPTION ";
-                sql += " WHEN duplicate_object THEN null ";
-                sql += " END $$";
-
+                sql += " WHEN duplicate_object THEN null; ";
+                sql += " END $$;";
                 sqlcommands.Add(sql);
             }
         }
@@ -102,6 +102,21 @@ namespace ORMapper
             List<string> foreginKeySqlList = new();
             foreach (var i in Tables)
             {
+                if (i._GetTable().isManyToManyTable)
+                {
+                    var createsqlscript = "Create Table IF NOT EXISTS " + i._GetTable().TableName + " (";
+                    Column col1 = i._GetTable().Columns[0];
+                    Column col2 = i._GetTable().Columns[1];
+
+                    createsqlscript += col1.ColumnName + " " + toDatabaseType(col1.Type);
+                    createsqlscript += ", ";
+                    createsqlscript += col2.ColumnName + " " + toDatabaseType(col2.Type);
+                    createsqlscript += ", ";
+                    createsqlscript += "primary key("+col1.ColumnName+","+col2.ColumnName+")";
+                    createsqlscript += ");";
+                    sqlcommands.Add(createsqlscript);
+                    continue;
+                }
                 var createSqlScript = "Create Table IF NOT EXISTS " + i._GetTable().TableName + " (";
                 foreach (var column in i._GetTable().Columns)
                     if (!column.IsForeignKey)

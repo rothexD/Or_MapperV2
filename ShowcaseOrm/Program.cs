@@ -22,7 +22,7 @@ namespace ShowcaseOrm
             ShowCustomFluentQueryApi.Show();
 
             ShowMapTablesAndTypes.Show(false);
-
+            
             ShowInsertStudent.Show();
             ShowModifyStudent.Show();
 
@@ -31,22 +31,12 @@ namespace ShowcaseOrm
             Show1ToNSave.Show();
             ShowNtoMSave.Show();
 
+            ShowGetAllCourses.Show();
             
             ShowModifyInDepth.Show();
+            Console.WriteLine(counter.longTermCounter);
             ShowTransaction.Show();
-            // InsertModifyShouldsave.Show();
-            //GetStudent.Show();
-            /*Console.WriteLine(counter.counterI);
-            Console.WriteLine(counter.counterI);
-            InsertObject.Show();
-            Console.WriteLine(counter.counterI);
-            ModifyObject.Show();
-            Console.WriteLine(counter.counterI);
-            GetAllObjets.Show();
-            Console.WriteLine(counter.counterI);
-            TryCourse.Show();
-            Console.WriteLine(counter.counterI);
-            insertClass.Show();*/
+            
         }
     }
 }

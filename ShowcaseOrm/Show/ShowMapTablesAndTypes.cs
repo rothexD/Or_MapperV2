@@ -7,15 +7,15 @@ namespace ShowcaseOrm.Show
 {
     public class ShowMapTablesAndTypes
     {
-        public static void Show(bool PrintToConsole = true)
+        public static void Show(bool PrintToConsole = false)
         {
             ShowHelper.Begin("Showing OrMapping");
             
             List<Type> tables = new();
             tables.Add(typeof(Gender));
+            tables.Add(typeof(STUDENT_COURSES));
             tables.Add(typeof(Course));
             tables.Add(typeof(Student));
-            tables.Add(typeof(STUDENT_COURSES));
             tables.Add(typeof(Class));
             tables.Add(typeof(Teacher));
             

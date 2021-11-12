@@ -2,7 +2,7 @@
 
 namespace ShowcaseOrm.Models
 {
-    [Table]
+    [ManyToManyTable]
     public class STUDENT_COURSES
     {
         [PrimaryKey]

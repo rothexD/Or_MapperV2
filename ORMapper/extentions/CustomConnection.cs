@@ -7,9 +7,10 @@ namespace ORMapper.Models
     /// <summary>
     /// defines a static global counter
     /// </summary>
-    internal static class counter
+    public static class counter
     {
         public static int counterI;
+        public static int longTermCounter;
     }
     /// <summary>
     /// defines a customconnection that can be used with using(){} scoping
@@ -36,6 +37,7 @@ namespace ORMapper.Models
             connection = new NpgsqlConnection(connectionstring);
             connection.Open();
             counter.counterI++;
+            
             return connection;
         }
     }
@@ -62,6 +64,7 @@ namespace ORMapper.Models
         public static void CustomOpen(this IDbConnection a)
         {
             counter.counterI++;
+            counter.longTermCounter++;
             a.Open();
         }
         
