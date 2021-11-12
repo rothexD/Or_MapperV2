@@ -1,5 +1,5 @@
 create database school encoding 'utf-8';
-\c school;
+/*\c school;
 
 
 CREATE TYPE Gender AS ENUM ('male','female');
@@ -40,7 +40,7 @@ CREATE TABLE STUDENT_COURSES
 (
     KSTUDENT VARCHAR(24) NOT NULL REFERENCES STUDENTS (ID) on update cascade,
     KCOURSE  VARCHAR(24) NOT NULL REFERENCES COURSES (ID) on update cascade
-);
+);*/
 
 
 /*drop table STUDENT_COURSES;

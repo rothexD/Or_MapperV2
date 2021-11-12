@@ -282,15 +282,42 @@ namespace ORMapper
             command.CommandText += ") Values (" + insert + ")" + update;
             con.CustomOpen();
             command.ExecuteNonQuery();
-            command.Dispose();
             con.CloseCustom();
+            command.Dispose();
+            
 
             for (var i = 0; i < ent.Externals.Length; i++)
-                foreach (var x in ent.Externals[i].GetValue(o) as IEnumerable)
+            {
+                if (ent.Externals[i].IsManyToMany)
                 {
-                    SaveInternal(x, localcache);
-                    localcache.Add(x);
+                    foreach (var x in ent.Externals[i].GetValue(o) as IEnumerable)
+                    {
+                        SaveInternal(x, localcache);
+                        
+                        var con2 = Connection();
+                        command = con2.CreateCommand();
+                        command.CommandText = "insert into "
+                                              + ent.Externals[i].RemoteTable
+                                              + "(" + ent.Externals[i].ColumnName + "," +
+                                              ent.Externals[i].TheirReferenceToThisColumnName + ") values ("
+                                              + ent.PrimaryKey.GetValue(o) +","
+                                              + x._GetTable().PrimaryKey.GetValue(x)
+                                              + ");";
+                        Console.WriteLine(command.CommandText);
+                        command.ExecuteNonQuery();
+                        con2.Close();
+                        con2.Dispose();
+                        
+                    }
                 }
+                else
+                {
+                    foreach (var x in ent.Externals[i].GetValue(o) as IEnumerable)
+                    {
+                        SaveInternal(x, localcache);
+                    }
+                }
+            }
         }
 
         /// <summary>

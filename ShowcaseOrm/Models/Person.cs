@@ -50,6 +50,7 @@ namespace ShowcaseOrm.Models
     public enum Gender
     {
         female = 0,
-        male = 1
+        male = 1,
+        other = 2
     }
 }

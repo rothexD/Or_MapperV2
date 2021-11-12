@@ -19,24 +19,22 @@ namespace ShowcaseOrm
         {
             Orm.Connectionstring = "Server=127.0.0.1;Port=5438;Database=school;User Id=postgres;Password=postgres;";
 
-            string[] test = {"a","b"};
-            (var para,string sqlstring) = CustomQuery.Create("@").Select(test).From("student").Join("hans","hans.ID","student.Id").Where()
-                .Equals(new SecureParameter(test), "test").And().Greater(2,1).Build();
-            Console.WriteLine("sql: "+  Environment.NewLine+sqlstring);
-            Console.WriteLine("paras");
-            para.ForEach(x => Console.WriteLine("key: " + x.Item1 + " ,Value: " + x.Item2));
+            ShowCustomFluentQueryApi.Show();
 
-            /*List<Type> tables = new();
-            tables.Add(typeof(Gender));
-            tables.Add(typeof(Course));
-            tables.Add(typeof(Student));
-            tables.Add(typeof(STUDENT_COURSES));
-            tables.Add(typeof(Class));
-            tables.Add(typeof(Teacher));*/
+            ShowMapTablesAndTypes.Show(false);
 
-            //OrmMapping.Map(tables.ToArray(),false);
+            ShowInsertStudent.Show();
+            ShowModifyStudent.Show();
+
             
-           // InsertModifyShouldsave.Show();
+            Show1To1Save.Show();
+            Show1ToNSave.Show();
+            ShowNtoMSave.Show();
+
+            
+            ShowModifyInDepth.Show();
+            ShowTransaction.Show();
+            // InsertModifyShouldsave.Show();
             //GetStudent.Show();
             /*Console.WriteLine(counter.counterI);
             Console.WriteLine(counter.counterI);

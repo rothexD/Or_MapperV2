@@ -20,8 +20,8 @@ namespace ORMapper
         {
             List<string> sqlCommands = new();
 
-            parseEnums(sqlCommands, TypesToMap.Where(x => x.IsEnum).ToArray());
-            parseTables(sqlCommands, TypesToMap.Where(x => x.IsDefined(typeof(TableAttribute))).ToArray());
+            ParseEnums(sqlCommands, TypesToMap.Where(x => x.IsEnum).ToArray());
+            ParseTables(sqlCommands, TypesToMap.Where(x => x.IsDefined(typeof(TableAttribute))).ToArray());
 
 
             if (SwitchConsoleOrDb)
@@ -70,7 +70,7 @@ namespace ORMapper
         /// </summary>
         /// <param name="sqlcommands">list of sqlstrings which the new commands are added too</param>
         /// <param name="enums">list of enums that should be parsed</param>
-        public static void parseEnums(List<string> sqlcommands, Type[] enums)
+        public static void ParseEnums(List<string> sqlcommands, Type[] enums)
         {
             foreach (var i in enums)
             {
@@ -81,12 +81,12 @@ namespace ORMapper
                 foreach (var x in values) insert += "'" + x + "',";
                 insert = insert.Trim(',');
                 if (string.IsNullOrWhiteSpace(insert)) continue;
-                string sql = "DO $$ BEGIN";
-                sql += "CREATE TYPE my_type AS (" + insert +")";
+                string sql = "DO $$ BEGIN ";
+                sql += " CREATE TYPE my_type AS (" + insert +") ";
                     
-                sql += "EXCEPTION";
-                sql += "WHEN duplicate_object THEN null";
-                sql += "END $$";
+                sql += " EXCEPTION ";
+                sql += " WHEN duplicate_object THEN null ";
+                sql += " END $$";
 
                 sqlcommands.Add(sql);
             }
@@ -97,9 +97,9 @@ namespace ORMapper
         /// </summary>
         /// <param name="sqlcommands">list of sqlstrings which the new commands are added too</param>
         /// <param name="Tables">list of tables that should be parsed</param>
-        public static void parseTables(List<string> sqlcommands, Type[] Tables)
+        public static void ParseTables(List<string> sqlcommands, Type[] Tables)
         {
-            List<string> foreingKeySqlList = new();
+            List<string> foreginKeySqlList = new();
             foreach (var i in Tables)
             {
                 var createSqlScript = "Create Table IF NOT EXISTS " + i._GetTable().TableName + " (";
@@ -143,10 +143,10 @@ namespace ORMapper
                                 whichForeignKeyIsReferenced = insert.Table.PrimaryKey.ColumnName;
                             }
 
-                            foreingKeySqlList.Add("ALTER TABLE " + whichTableToALter + " DROP CONSTRAINT IF EXISTS " +
+                            foreginKeySqlList.Add("ALTER TABLE " + whichTableToALter + " DROP CONSTRAINT IF EXISTS " +
                                                   "\"fk_" + column.Table.TableName + "_" + column.ColumnName + "_" +
                                                   whichTableToALter + "_" + whichForeignKeyIsReferenced + "\";");
-                            foreingKeySqlList.Add("Alter table " + whichTableToALter + " ADD Constraint \"" +
+                            foreginKeySqlList.Add("Alter table " + whichTableToALter + " ADD Constraint \"" +
                                                   "fk_" + column.Table.TableName + "_" + column.ColumnName + "_" +
                                                   whichTableToALter + "_" + whichForeignKeyIsReferenced +
                                                   "\" Foreign Key (" + whichForeignkeyToConstraint +
@@ -156,12 +156,12 @@ namespace ORMapper
                         }
                         else
                         {
-                            foreingKeySqlList.Add("ALTER TABLE " + column.RemoteTable._GetTable().TableName +
+                            foreginKeySqlList.Add("ALTER TABLE " + column.RemoteTable._GetTable().TableName +
                                                   " DROP CONSTRAINT IF EXISTS " + "\"fk_" + column.Table.TableName +
                                                   "_" + column.ColumnName + "_" +
                                                   column.RemoteTable._GetTable().TableName + "_" +
                                                   column.Table.PrimaryKey.ColumnName + "\";");
-                            foreingKeySqlList.Add("Alter table " + column.RemoteTable._GetTable().TableName +
+                            foreginKeySqlList.Add("Alter table " + column.RemoteTable._GetTable().TableName +
                                                   " ADD Constraint \"" +
                                                   "fk_" + column.Table.TableName + "_" + column.ColumnName + "_" +
                                                   column.RemoteTable._GetTable().TableName + "_" +
@@ -178,7 +178,7 @@ namespace ORMapper
                 sqlcommands.Add(createSqlScript);
             }
 
-            foreach (var y in foreingKeySqlList) sqlcommands.Add(y);
+            foreach (var y in foreginKeySqlList) sqlcommands.Add(y);
         }
 
         public static string toDatabaseType(Type e)
