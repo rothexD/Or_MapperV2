@@ -142,10 +142,10 @@ namespace ORMapper
             command.CommandText = t._GetTable().GetSelectSql(null) + " Where " + t._GetTable().PrimaryKey.ColumnName +
                                   " = :pk";
 
-            Parameterhelper.Help(":pk", pk, command);
+            command.Help(":pk", pk);
 
             var reader = command.ExecuteReader();
-            
+
             if (reader.Read()) returnObject = _CreateObject(t, reader, localcache);
             reader.Close();
             reader.Dispose();
@@ -178,7 +178,7 @@ namespace ORMapper
                 : t._GetTable().GetSelectSql(null) + " Where " + foreignKeyTablename + " = :pk";
 
 
-            Parameterhelper.Help(":pk", pk, command);
+            command.Help(":pk", pk);
             var reader = command.ExecuteReader();
 
             var listType = typeof(List<>);
@@ -211,7 +211,7 @@ namespace ORMapper
                             SaveInternal(x, new List<object>());
                     else
                         SaveInternal(o, new List<object>());
-                    
+
                     scope.Complete();
                 }
             }
@@ -235,10 +235,7 @@ namespace ORMapper
             if (o == null) return;
 
             if (caching && SearchInCache(o.GetType(), o._GetTable().PrimaryKey.GetValue(o), localcache) != null) return;
-            if (caching)
-            {
-                localcache.Add(o);
-            }
+            if (caching) localcache.Add(o);
 
             var con = Connection();
 
@@ -259,18 +256,15 @@ namespace ORMapper
                 if (ent.Internals[i].IsForeignKey)
                 {
                     SaveInternal(ent.Internals[i].GetValue(o), localcache);
-                    if (caching)
-                    {
-                        localcache.Add(ent.Internals[i].GetValue(o));
-                    }
+                    if (caching) localcache.Add(ent.Internals[i].GetValue(o));
                 }
 
 
                 command.CommandText += ent.Internals[i].ColumnName;
                 insert += ":v" + i;
 
-                Parameterhelper.Help(":v" + i,
-                    ent.Internals?[i].ToColumnType(ent.Internals?[i].GetValue(o), localcache), command);
+                command.Help(":v" + i,
+                    ent.Internals?[i].ToColumnType(ent.Internals?[i].GetValue(o), localcache));
 
                 if (!ent.Internals[i].IsPrimaryKey)
                 {
@@ -281,8 +275,7 @@ namespace ORMapper
 
                     update += ent.Internals[i].ColumnName + " = :w" + i;
 
-                    Parameterhelper.Help(":w" + i,
-                        ent.Internals[i].ToColumnType(ent.Internals[i].GetValue(o), localcache), command);
+                    command.Help(":w" + i, ent.Internals[i].ToColumnType(ent.Internals[i].GetValue(o), localcache));
                 }
             }
 
@@ -365,7 +358,7 @@ namespace ORMapper
             command.CommandText =
                 $"Delete from {t._GetTable().TableName} where {t._GetTable().PrimaryKey.ColumnName} = :pk";
 
-            Parameterhelper.Help(":pk", pk, command);
+            command.Help(":pk", pk);
 
             command.ExecuteNonQuery();
             command.Dispose();

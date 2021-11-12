@@ -1,4 +1,4 @@
-﻿namespace ORMapper.extentions
+﻿namespace ORMapper.FluentSqlQueryApi
 {
     public class SecureParameter
     {

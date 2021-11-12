@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Reflection.Metadata.Ecma335;
-using ORMapper.extentions.IFluentSqlInterfaces;
-using ORMapper.Models;
+﻿using System.Collections.Generic;
+using ORMapper.FluentSqlQueryApi.IFluentSqlInterfaces;
 
-namespace ORMapper.extentions
+namespace ORMapper.FluentSqlQueryApi
 {
     public class CustomQuery : ISelect, IFrom, ITypeOfWhere, IConjunction, IJoinAndWhere
     {

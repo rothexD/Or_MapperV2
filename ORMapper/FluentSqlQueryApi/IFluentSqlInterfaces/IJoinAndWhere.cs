@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace ORMapper.extentions.IFluentSqlInterfaces
+namespace ORMapper.FluentSqlQueryApi.IFluentSqlInterfaces
 {
     public interface IJoinAndWhere
     {

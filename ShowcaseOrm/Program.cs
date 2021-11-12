@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using ORMapper;
 using ORMapper.extentions;
+using ORMapper.FluentSqlQueryApi;
 using ORMapper.Models;
 using ShowcaseOrm.Models;
 using ShowcaseOrm.Show;

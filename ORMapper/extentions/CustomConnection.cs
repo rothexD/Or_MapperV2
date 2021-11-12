@@ -7,7 +7,7 @@ namespace ORMapper.Models
     /// <summary>
     /// defines a static global counter
     /// </summary>
-    public static class counter
+    internal static class counter
     {
         public static int counterI;
     }
@@ -43,7 +43,7 @@ namespace ORMapper.Models
     /// <summary>
     /// defines an IDbConnection extentions
     /// </summary>
-    public static class DbExtention
+    public static class DbExtentions
     {
         /// <summary>
         /// Decrements the global counter.counterI by 1 and closes the connection

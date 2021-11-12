@@ -1,6 +1,4 @@
-﻿using System.Data;
-
-namespace ORMapper.extentions.IFluentSqlInterfaces
+﻿namespace ORMapper.FluentSqlQueryApi.IFluentSqlInterfaces
 {
     public interface ITypeOfWhere
     {
