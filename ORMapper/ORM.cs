@@ -6,7 +6,9 @@ using System.Linq;
 using System.Transactions;
 using Npgsql;
 using ORMapper.extentions;
+using ORMapper.Lazy;
 using ORMapper.Models;
+using ORMapper.Caches;
 
 namespace ORMapper
 {
@@ -15,6 +17,7 @@ namespace ORMapper
         private static readonly Dictionary<Type, Table> _mappedEntities = new();
         public static string Connectionstring = "";
 
+        private static Cache internalCache = new();
         /// <summary>
         ///     creates a new connection
         /// </summary>
@@ -83,38 +86,46 @@ namespace ORMapper
             {
                 if (localcache == null) localcache = new List<object>();
                 localcache.Add(returnObject = Activator.CreateInstance(t));
-            }
-
-            foreach (var i in t._GetTable().Internals)
-                i.SetValue(returnObject, i.ToFieldType(reader.GetValue(reader.GetOrdinal(i.ColumnName)), localcache));
 
 
-            foreach (var i in t._GetTable().Externals)
-            {
-                var list = Activator.CreateInstance(i.Type) as IList;
-                if (i.IsExternal && !i.IsManyToMany)
+                foreach (var i in t._GetTable().Internals)
                 {
-                    var value = _CreateObjectAll(i.Type.GetGenericArguments()[0], localcache,
-                        i.Table.PrimaryKey.GetValue(returnObject), i.ColumnName) as IList;
-                    i.SetValue(returnObject, value);
+                    i.SetValue(returnObject, i.ToFieldType(reader.GetValue(reader.GetOrdinal(i.ColumnName)), localcache));
+                    localcache.Add(returnObject);
                 }
+                    
 
-                if (i.IsExternal && i.IsManyToMany)
+
+                foreach (var i in t._GetTable().Externals)
                 {
-                    var referencesFromNtoMTable = _CreateObjectAll(i.RemoteTable, localcache,
-                        i.Table.PrimaryKey.GetValue(returnObject), i.ColumnName, false);
-
-                    var returnList = Activator.CreateInstance(i.ColumnType) as IList;
-
-                    foreach (var o in referencesFromNtoMTable as IList)
+                    var list = Activator.CreateInstance(i.Type) as IList;
+                    if (i.IsExternal && !i.IsManyToMany)
                     {
-                        var key = o._GetTable().Columns.First(x =>
-                            x.ColumnName.ToLower() == i.TheirReferenceToThisColumnName.ToLower());
-                        var pk = key.GetValue(o);
-                        returnList.Add(_CreateObject(i.ColumnType.GetGenericArguments()[0], pk, localcache));
+                        var value = _CreateObjectAll(i.Type.GetGenericArguments()[0], localcache,
+                            i.Table.PrimaryKey.GetValue(returnObject), i.ColumnName) as IList;
+                        i.SetValue(returnObject, value);
                     }
 
-                    i.SetValue(returnObject, returnList);
+                    if (i.IsExternal && i.IsManyToMany)
+                    {
+                        var referencesFromNtoMTable = _CreateObjectAll(i.RemoteTable, localcache,
+                            i.Table.PrimaryKey.GetValue(returnObject), i.ColumnName, false);
+
+                        var returnList = Activator.CreateInstance(i.ColumnType) as IList;
+
+                        foreach (var o in referencesFromNtoMTable as IList)
+                        {
+                            var key = o._GetTable().Columns.First(x =>
+                                x.ColumnName.ToLower() == i.TheirReferenceToThisColumnName.ToLower());
+                            var pk = key.GetValue(o);
+
+                            var obj = _CreateObject(i.ColumnType.GetGenericArguments()[0], pk, localcache);
+                            localcache.Add(obj);
+                            returnList.Add(obj);
+                        }
+
+                        i.SetValue(returnObject, returnList);
+                    }
                 }
             }
 
@@ -144,7 +155,7 @@ namespace ORMapper
 
             command.Help(":pk", pk);
 
-            var reader = command.ExecuteReader();
+            var reader = command.CustomReader();
 
             if (reader.Read()) returnObject = _CreateObject(t, reader, localcache);
             reader.Close();
@@ -179,7 +190,7 @@ namespace ORMapper
 
 
             command.Help(":pk", pk);
-            var reader = command.ExecuteReader();
+            var reader = command.CustomReader();
 
             var listType = typeof(List<>);
             var constructedListType = listType.MakeGenericType(t);
@@ -233,7 +244,10 @@ namespace ORMapper
             var ent = o._GetTable();
             var first = true;
             if (o == null) return;
-
+            if (o is IMyLazy && !(o as IMyLazy).Isloaded)
+            {
+                return;
+            }
             if (caching && SearchInCache(o.GetType(), o._GetTable().PrimaryKey.GetValue(o), localcache) != null) return;
             if (caching) localcache.Add(o);
 
@@ -281,53 +295,46 @@ namespace ORMapper
 
             command.CommandText += ") Values (" + insert + ")" + update;
             con.CustomOpen();
-            command.ExecuteNonQuery();
+            command.CustomNonQuery();
             con.CloseCustom();
             command.Dispose();
-            
+
 
             for (var i = 0; i < ent.Externals.Length; i++)
-            {
                 if (ent.Externals[i].IsManyToMany)
-                {
                     foreach (var x in ent.Externals[i].GetValue(o) as IEnumerable)
                     {
                         SaveInternal(x, localcache);
-                        /*if (SearchInCache(x.GetType(), x._GetTable().PrimaryKey.GetValue(x), localcache) != null)
-                        {
+                        if (SearchInCache(x.GetType(), x._GetTable().PrimaryKey.GetValue(x), localcache) != null)
                             continue;
-                        }*/
-                        
+
                         var con2 = Connection();
                         command = con2.CreateCommand();
                         command.CommandText = "insert into "
                                               + ent.Externals[i].RemoteTable._GetTable().TableName
-                                              + "("+ent.Externals[i].TheirReferenceToThisColumnName + "," +
+                                              + "(" + ent.Externals[i].TheirReferenceToThisColumnName + "," +
                                               ent.Externals[i].ColumnName + ") values ("
-                                              + ":para1,:para2) ON CONFLICT ("+ent.Externals[i].TheirReferenceToThisColumnName+","+ent.Externals[i].ColumnName +") do nothing;";
+                                              + ":para1,:para2) ON CONFLICT (" +
+                                              ent.Externals[i].TheirReferenceToThisColumnName + "," +
+                                              ent.Externals[i].ColumnName + ") do nothing;";
                         var z = x._GetTable().PrimaryKey.GetValue(x);
-                        command.Help(":para1",x._GetTable().PrimaryKey.GetValue(x));
+                        command.Help(":para1", x._GetTable().PrimaryKey.GetValue(x));
                         var y = ent.Externals[i].Table;
                         var y2 = y.PrimaryKey;
                         var y3 = y2.GetValue(o);
-                        
-                        command.Help(":para2",y3);
-                        con2.Open();
-                        command.ExecuteNonQuery();
-                        con2.Close();
+
+                        command.Help(":para2", y3);
+                        con2.CustomOpen();
+                        command.CustomNonQuery();
+                        con2.CloseCustom();
                         con2.Dispose();
-                        
                     }
-                }
                 else
-                {
                     foreach (var x in ent.Externals[i].GetValue(o) as IEnumerable)
                     {
                         SaveInternal(x, localcache);
                         localcache.Add(x);
                     }
-                }
-            }
         }
 
         /// <summary>
@@ -397,7 +404,7 @@ namespace ORMapper
 
             command.Help(":pk", pk);
 
-            command.ExecuteNonQuery();
+            command.CustomNonQuery();
             command.Dispose();
             con.CloseCustom();
         }

@@ -130,8 +130,13 @@ namespace ORMapper
                     else
                     {
                         if (column.ColumnType.GetInterface(nameof(ICollection)) == null)
+                        {
                             createSqlScript += column.ColumnName + " " +
-                                               toDatabaseType(column.Type._GetTable().PrimaryKey.Type) + " not null ,";
+                                               toDatabaseType(column.Type._GetTable().PrimaryKey.Type) +
+                                               " not null ,";
+                        }
+                            
+                            
                         if (!column.IsManyToMany)
                         {
                             var insert = column.ColumnType.GetInterface(nameof(ICollection)) != null

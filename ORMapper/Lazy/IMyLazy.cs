@@ -1,6 +1,7 @@
 ﻿namespace ORMapper.Lazy
 {
-    internal interface IMyLazy
+    public abstract class IMyLazy
     {
+        public bool Isloaded { get; protected set; } = false;
     }
 }

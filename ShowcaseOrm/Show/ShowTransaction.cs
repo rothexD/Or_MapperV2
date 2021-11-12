@@ -6,7 +6,7 @@ namespace ShowcaseOrm.Show
     {
         public static void Show()
         {
-            ShowHelper.Begin("Showing modify in depth");
+            ShowHelper.Begin("Showing transactions");
             throw new NotImplementedException();
             ShowHelper.End();  
         }

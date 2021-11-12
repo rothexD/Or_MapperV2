@@ -8,7 +8,7 @@ namespace ShowcaseOrm.Show
     {
         public static void Show(bool PrintToConsole = true)
         {
-            ShowHelper.Begin("Showing insert Student");
+            ShowHelper.Begin("Showing modify Student");
 
             var i = Orm.Get<Student>("s.0");
 

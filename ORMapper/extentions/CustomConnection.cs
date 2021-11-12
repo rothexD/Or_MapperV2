@@ -68,10 +68,15 @@ namespace ORMapper.Models
             a.Open();
         }
         
-        public static void CustomNonQuery(this IDbCommand a)
+        public static int CustomNonQuery(this IDbCommand a)
         {
             Console.WriteLine(a.CommandText);
-            a.ExecuteNonQuery();
+            return a.ExecuteNonQuery();
+        }
+        public static IDataReader CustomReader(this IDbCommand a)
+        {
+            Console.WriteLine(a.CommandText);
+            return a.ExecuteReader();
         }
     }
 }
