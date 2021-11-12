@@ -75,12 +75,19 @@ namespace ORMapper
             foreach (var i in enums)
             {
                 if (!i.IsEnum) continue;
-                var sql = "Create Type " + i.Name + " as enum (";
+                
                 var values = Enum.GetValues(i);
-                foreach (var x in values) sql += "'" + x + "',";
+                string insert = "";
+                foreach (var x in values) insert += "'" + x + "',";
+                insert = insert.Trim(',');
+                if (string.IsNullOrWhiteSpace(insert)) continue;
+                string sql = "DO $$ BEGIN";
+                sql += "CREATE TYPE my_type AS (" + insert +")";
+                    
+                sql += "EXCEPTION";
+                sql += "WHEN duplicate_object THEN null";
+                sql += "END $$";
 
-                sql = sql.Trim(',');
-                sql += ");";
                 sqlcommands.Add(sql);
             }
         }

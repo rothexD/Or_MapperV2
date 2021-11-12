@@ -61,7 +61,10 @@ namespace ORMapper.Models
         public object GetValue(object obj)
         {
             if (Member is PropertyInfo)
-                return ((PropertyInfo) Member).GetValue(obj);
+            {
+               var z= ((PropertyInfo) Member).GetValue(obj);
+               return z;
+            }
             throw new NotSupportedException("Member type not supported");
         }
         /// <summary>
@@ -78,7 +81,7 @@ namespace ORMapper.Models
                 throw new NotSupportedException("Member type not supported");
         }
         /// <summary>
-        /// transfers a object to the columntype, uses caching by default
+        /// transfers a object to the columntype, uses caching by default (orm->db)
         /// </summary>
         /// <param name="value">value to be trasnformed</param>
         /// <param name="localchache">cache in which objects can be stored and searched for</param>
@@ -109,7 +112,7 @@ namespace ORMapper.Models
             return value;
         }
         /// <summary>
-        /// transfers a object to a different type
+        /// transfers a object to a different type (db->orm)
         /// </summary>
         /// <param name="value"></param>
         /// <param name="localcache"></param>

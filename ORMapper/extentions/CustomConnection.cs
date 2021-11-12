@@ -64,5 +64,11 @@ namespace ORMapper.Models
             counter.counterI++;
             a.Open();
         }
+        
+        public static void CustomNonQuery(this IDbCommand a)
+        {
+            Console.WriteLine(a.CommandText);
+            a.ExecuteNonQuery();
+        }
     }
 }

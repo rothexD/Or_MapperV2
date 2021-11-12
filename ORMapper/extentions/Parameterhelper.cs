@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Data;
 
-namespace ORMapper.FluentQuery
+namespace ORMapper.extentions
 {
     public static class Parameterhelper
     {
@@ -11,7 +11,7 @@ namespace ORMapper.FluentQuery
         /// <param name="key">Key for IDataParameter</param>
         /// <param name="value">Value for IDataParameter</param>
         /// <param name="command">IDbCommand</param>
-        public static void ParaHelp(object key, object value, IDbCommand command)
+        public static void Help(object key, object value, IDbCommand command)
         {
             IDataParameter p = command.CreateParameter();
             p.ParameterName = key.ToString();

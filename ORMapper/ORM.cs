@@ -5,7 +5,7 @@ using System.Data;
 using System.Linq;
 using System.Transactions;
 using Npgsql;
-using ORMapper.FluentQuery;
+using ORMapper.extentions;
 using ORMapper.Models;
 
 namespace ORMapper
@@ -142,10 +142,10 @@ namespace ORMapper
             command.CommandText = t._GetTable().GetSelectSql(null) + " Where " + t._GetTable().PrimaryKey.ColumnName +
                                   " = :pk";
 
-            Parameterhelper.ParaHelp(":pk", pk, command);
+            Parameterhelper.Help(":pk", pk, command);
 
             var reader = command.ExecuteReader();
-
+            
             if (reader.Read()) returnObject = _CreateObject(t, reader, localcache);
             reader.Close();
             reader.Dispose();
@@ -178,7 +178,7 @@ namespace ORMapper
                 : t._GetTable().GetSelectSql(null) + " Where " + foreignKeyTablename + " = :pk";
 
 
-            Parameterhelper.ParaHelp(":pk", pk, command);
+            Parameterhelper.Help(":pk", pk, command);
             var reader = command.ExecuteReader();
 
             var listType = typeof(List<>);
@@ -269,7 +269,7 @@ namespace ORMapper
                 command.CommandText += ent.Internals[i].ColumnName;
                 insert += ":v" + i;
 
-                Parameterhelper.ParaHelp(":v" + i,
+                Parameterhelper.Help(":v" + i,
                     ent.Internals?[i].ToColumnType(ent.Internals?[i].GetValue(o), localcache), command);
 
                 if (!ent.Internals[i].IsPrimaryKey)
@@ -281,7 +281,7 @@ namespace ORMapper
 
                     update += ent.Internals[i].ColumnName + " = :w" + i;
 
-                    Parameterhelper.ParaHelp(":w" + i,
+                    Parameterhelper.Help(":w" + i,
                         ent.Internals[i].ToColumnType(ent.Internals[i].GetValue(o), localcache), command);
                 }
             }
@@ -365,7 +365,7 @@ namespace ORMapper
             command.CommandText =
                 $"Delete from {t._GetTable().TableName} where {t._GetTable().PrimaryKey.ColumnName} = :pk";
 
-            Parameterhelper.ParaHelp(":pk", pk, command);
+            Parameterhelper.Help(":pk", pk, command);
 
             command.ExecuteNonQuery();
             command.Dispose();
