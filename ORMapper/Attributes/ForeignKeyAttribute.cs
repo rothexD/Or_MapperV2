@@ -21,7 +21,5 @@ namespace ORMapper.Attributes
     [AttributeUsage(AttributeTargets.Property)]
     public class ForeignKeyAttribute : ColumnAttribute
     {
-        public string TheirReferenceToThisColumnName = null;
-        public Type RemoteTableName = null;
     }
 }

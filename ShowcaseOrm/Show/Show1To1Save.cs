@@ -27,6 +27,7 @@ namespace ShowcaseOrm.Show
             course.Teacher = teacher1to1;
             course.Students = new List<Student>();
            
+            teacher1to1.Courses.Add(course);
             Orm.Save(course);
             
             var i = Orm.Get<Teacher>("t.0");

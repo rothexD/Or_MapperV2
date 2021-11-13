@@ -2,13 +2,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Transactions;
 using Npgsql;
-using ORMapper.extentions;
-using ORMapper.Lazy;
-using ORMapper.Models;
 using ORMapper.Caches;
+using ORMapper.extentions;
+using ORMapper.Models;
 
 namespace ORMapper
 {
@@ -17,7 +18,8 @@ namespace ORMapper
         private static readonly Dictionary<Type, Table> _mappedEntities = new();
         public static string Connectionstring = "";
 
-        private static Cache internalCache = new();
+        public static readonly TrackingCache internalCache = new();
+
         /// <summary>
         ///     creates a new connection
         /// </summary>
@@ -52,13 +54,13 @@ namespace ORMapper
         /// <returns>null if not in cache, object if in cache</returns>
         public static object SearchInCache(Type findObjectOfType, object pk, ICollection<object> localcache)
         {
-            if (localcache == null) return null;
-            foreach (var i in localcache)
-            {
-                if (i.GetType() != findObjectOfType) continue;
+            if (localcache != null)
+                foreach (var i in localcache)
+                {
+                    if (i.GetType() != findObjectOfType) continue;
 
-                if (findObjectOfType._GetTable().PrimaryKey.GetValue(i).Equals(pk)) return i;
-            }
+                    if (findObjectOfType._GetTable().PrimaryKey.GetValue(i).Equals(pk)) return i;
+                }
 
             return null;
         }
@@ -81,19 +83,23 @@ namespace ORMapper
                             localcache),
                     localcache)
                 : null;
-
+            if(internalCache.Contains(t, t._GetTable().PrimaryKey.ToFieldType(reader.GetValue(reader.GetOrdinal(t._GetTable().PrimaryKey.ColumnName)),
+                        localcache)))
+            {
+                returnObject = internalCache.Get(t, t._GetTable().PrimaryKey
+                    .ToFieldType(reader.GetValue(reader.GetOrdinal(t._GetTable().PrimaryKey.ColumnName)), localcache));
+            }
             if (returnObject == null)
             {
                 if (localcache == null) localcache = new List<object>();
                 localcache.Add(returnObject = Activator.CreateInstance(t));
-
-
+                
                 foreach (var i in t._GetTable().Internals)
                 {
-                    i.SetValue(returnObject, i.ToFieldType(reader.GetValue(reader.GetOrdinal(i.ColumnName)), localcache));
+                    i.SetValue(returnObject,
+                        i.ToFieldType(reader.GetValue(reader.GetOrdinal(i.ColumnName)), localcache));
                     localcache.Add(returnObject);
                 }
-                    
 
 
                 foreach (var i in t._GetTable().Externals)
@@ -121,14 +127,15 @@ namespace ORMapper
 
                             var obj = _CreateObject(i.ColumnType.GetGenericArguments()[0], pk, localcache);
                             localcache.Add(obj);
+                            //internalCache.Add(obj);
                             returnList.Add(obj);
                         }
-
+                        //internalCache.Add(returnList);
                         i.SetValue(returnObject, returnList);
                     }
                 }
             }
-
+            internalCache.Add(returnObject);
             return returnObject;
         }
 
@@ -144,6 +151,7 @@ namespace ORMapper
             bool shouldMethodUseCaching = true)
         {
             var returnObject = shouldMethodUseCaching ? SearchInCache(t, pk, localcache) : null;
+            if (internalCache.Contains(t, pk)) returnObject = internalCache.Get(t, pk);
             if (returnObject != null) return returnObject;
 
             var con = Connection();
@@ -153,7 +161,7 @@ namespace ORMapper
             command.CommandText = t._GetTable().GetSelectSql(null) + " Where " + t._GetTable().PrimaryKey.ColumnName +
                                   " = :pk";
 
-            command.Help(":pk", pk);
+            command.HelpWithParameter(":pk", pk);
 
             var reader = command.CustomReader();
 
@@ -189,7 +197,7 @@ namespace ORMapper
                 : t._GetTable().GetSelectSql(null) + " Where " + foreignKeyTablename + " = :pk";
 
 
-            command.Help(":pk", pk);
+            command.HelpWithParameter(":pk", pk);
             var reader = command.CustomReader();
 
             var listType = typeof(List<>);
@@ -197,7 +205,12 @@ namespace ORMapper
             var objectlist = Activator.CreateInstance(constructedListType) as IList;
 
 
-            while (reader.Read()) objectlist.Add(_CreateObject(t, reader, localcache, shouldMethodUseCaching));
+            while (reader.Read())
+            {
+                var createdObj = _CreateObject(t, reader, localcache, shouldMethodUseCaching);
+                internalCache.Add(createdObj);
+                objectlist.Add(createdObj);
+            }
 
 
             reader.Close();
@@ -239,17 +252,14 @@ namespace ORMapper
         /// <param name="o">which object(table entry)</param>
         /// <param name="localcache"></param>
         /// <param name="caching">should caching be used by default true (unused)</param>
-        internal static void SaveInternal(object o, List<object> localcache, bool caching = true)
+        internal static void SaveInternal(object o, List<object> localcache)
         {
             var ent = o._GetTable();
             var first = true;
             if (o == null) return;
-            if (o is IMyLazy && !(o as IMyLazy).Isloaded)
-            {
-                return;
-            }
-            if (caching && SearchInCache(o.GetType(), o._GetTable().PrimaryKey.GetValue(o), localcache) != null) return;
-            if (caching) localcache.Add(o);
+
+            if (SearchInCache(o.GetType(), o._GetTable().PrimaryKey.GetValue(o), localcache) != null) return;
+            localcache.Add(o);
 
             var con = Connection();
 
@@ -258,53 +268,57 @@ namespace ORMapper
             var update = " ON CONFLICT (" + ent.PrimaryKey.ColumnName + ") DO UPDATE SET ";
             var insert = "";
 
-
-            for (var i = 0; i < ent.Internals.Length; i++)
+            if (internalCache.HasChanged(o))
             {
-                if (i > 0)
+                internalCache.Add(o);
+                for (var i = 0; i < ent.Internals.Length; i++)
                 {
-                    command.CommandText += ", ";
-                    insert += ", ";
+                    if (i > 0)
+                    {
+                        command.CommandText += ", ";
+                        insert += ", ";
+                    }
+
+                    if (ent.Internals[i].IsForeignKey)
+                    {
+                        SaveInternal(ent.Internals[i].GetValue(o), localcache);
+                        localcache.Add(ent.Internals[i].GetValue(o));
+                    }
+
+                    
+                    command.CommandText += ent.Internals[i].ColumnName;
+                    insert += ":v" + i;
+
+                    command.HelpWithParameter(":v" + i,
+                        ent.Internals?[i].ToColumnType(ent.Internals?[i].GetValue(o), localcache));
+
+                    if (!ent.Internals[i].IsPrimaryKey)
+                    {
+                        if (first)
+                            first = false;
+                        else
+                            update += ", ";
+
+                        update += ent.Internals[i].ColumnName + " = :w" + i;
+
+                        command.HelpWithParameter(":w" + i, ent.Internals[i].ToColumnType(ent.Internals[i].GetValue(o), localcache));
+                    }
                 }
 
-                if (ent.Internals[i].IsForeignKey)
-                {
-                    SaveInternal(ent.Internals[i].GetValue(o), localcache);
-                    if (caching) localcache.Add(ent.Internals[i].GetValue(o));
-                }
-
-
-                command.CommandText += ent.Internals[i].ColumnName;
-                insert += ":v" + i;
-
-                command.Help(":v" + i,
-                    ent.Internals?[i].ToColumnType(ent.Internals?[i].GetValue(o), localcache));
-
-                if (!ent.Internals[i].IsPrimaryKey)
-                {
-                    if (first)
-                        first = false;
-                    else
-                        update += ", ";
-
-                    update += ent.Internals[i].ColumnName + " = :w" + i;
-
-                    command.Help(":w" + i, ent.Internals[i].ToColumnType(ent.Internals[i].GetValue(o), localcache));
-                }
+                command.CommandText += ") Values (" + insert + ")" + update;
+                con.CustomOpen();
+                command.CustomNonQuery();
+                con.CloseCustom();
+                command.Dispose();
             }
-
-            command.CommandText += ") Values (" + insert + ")" + update;
-            con.CustomOpen();
-            command.CustomNonQuery();
-            con.CloseCustom();
-            command.Dispose();
-
 
             for (var i = 0; i < ent.Externals.Length; i++)
                 if (ent.Externals[i].IsManyToMany)
                     foreach (var x in ent.Externals[i].GetValue(o) as IEnumerable)
                     {
+                        //if (!internalCache.HasChanged(x)) continue;
                         SaveInternal(x, localcache);
+
                         if (SearchInCache(x.GetType(), x._GetTable().PrimaryKey.GetValue(x), localcache) != null)
                             continue;
 
@@ -318,12 +332,12 @@ namespace ORMapper
                                               ent.Externals[i].TheirReferenceToThisColumnName + "," +
                                               ent.Externals[i].ColumnName + ") do nothing;";
                         var z = x._GetTable().PrimaryKey.GetValue(x);
-                        command.Help(":para1", x._GetTable().PrimaryKey.GetValue(x));
+                        command.HelpWithParameter(":para1", x._GetTable().PrimaryKey.GetValue(x));
                         var y = ent.Externals[i].Table;
                         var y2 = y.PrimaryKey;
                         var y3 = y2.GetValue(o);
 
-                        command.Help(":para2", y3);
+                        command.HelpWithParameter(":para2", y3);
                         con2.CustomOpen();
                         command.CustomNonQuery();
                         con2.CloseCustom();
@@ -332,8 +346,8 @@ namespace ORMapper
                 else
                     foreach (var x in ent.Externals[i].GetValue(o) as IEnumerable)
                     {
+                        //if (!internalCache.HasChanged(x)) continue;
                         SaveInternal(x, localcache);
-                        localcache.Add(x);
                     }
         }
 
@@ -397,12 +411,12 @@ namespace ORMapper
             var con = Connection();
             con.CustomOpen();
             var command = con.CreateCommand();
-
+            internalCache.Remove(t,pk);
 
             command.CommandText =
                 $"Delete from {t._GetTable().TableName} where {t._GetTable().PrimaryKey.ColumnName} = :pk";
 
-            command.Help(":pk", pk);
+            command.HelpWithParameter(":pk", pk);
 
             command.CustomNonQuery();
             command.Dispose();

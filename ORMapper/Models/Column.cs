@@ -43,14 +43,15 @@ namespace ORMapper.Models
         public bool IsNullable { get; internal set; }
 
         public bool IsExternal { get; internal set; } = false;
-        
-        public Type RemoteTable { get; internal set; }
-        
+
+        public Type RemoteTable { get; internal set; } = null;
+
         /// <summary>
         /// Columname that is referenced by them for n:m
         /// </summary>
-        public string TheirReferenceToThisColumnName { get; internal set; }
-        public bool IsManyToMany { get; internal set; }
+        public string TheirReferenceToThisColumnName { get; internal set; } = null;
+
+        public bool IsManyToMany { get; internal set; } = false;
 
         /// <summary>
         /// Gets the value for an object

@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Runtime.ExceptionServices;
 using System.Runtime.InteropServices;
 using System.Threading;
 using ORMapper;
+using ORMapper.Caches;
 using ORMapper.extentions;
 using ORMapper.FluentSqlQueryApi;
 using ORMapper.Models;
@@ -18,11 +20,10 @@ namespace ShowcaseOrm
         private static void Main(string[] args)
         {
             Orm.Connectionstring = "Server=127.0.0.1;Port=5438;Database=school;User Id=postgres;Password=postgres;";
-
+            
             ShowCustomFluentQueryApi.Show();
 
             ShowMapTablesAndTypes.Show(false);
-            
             ShowInsertStudent.Show();
             ShowModifyStudent.Show();
 
@@ -32,11 +33,17 @@ namespace ShowcaseOrm
             ShowNtoMSave.Show();
 
             ShowGetAllCourses.Show();
-            
+
             ShowModifyInDepth.Show();
-            Console.WriteLine(counter.longTermCounter);
-            ShowTransaction.Show();
             
+            
+            Showcaching.Show();
+            ShowCachingSaving.Show();
+            
+            Console.WriteLine(counter.longTermCounter);
+            
+            
+            ShowTransaction.Show();
         }
     }
 }

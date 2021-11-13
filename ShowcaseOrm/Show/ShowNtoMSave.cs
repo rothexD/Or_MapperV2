@@ -19,7 +19,6 @@ namespace ShowcaseOrm.Show
             teacherExample.BirthDate = DateTime.Parse("11.01.1998");
             teacherExample.HireDate = DateTime.Parse("12.01.1998");
             teacherExample.Salary = 50000;
-
             
             var course = new Course();
             course.ID = "example many to many";
@@ -49,8 +48,13 @@ namespace ShowcaseOrm.Show
             
             course.Students.Add(student1);
             course.Students.Add(student2);
-            
+            student1.Course.Add(course);
+            student2.Course.Add(course);
             student1.Course.Add(course2);
+            course2.Students.Add(student1);
+            teacherExample.Courses.Add(course);
+            teacherExample.Courses.Add(course2);
+            
             Orm.Save(course);
             
             var i = Orm.Get<Student>("s.1");

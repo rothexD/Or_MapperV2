@@ -1,7 +1,8 @@
-﻿namespace ORMapper.Attributes
+﻿using System;
+
+namespace ORMapper.Attributes
 {
-    public class ForeignKeyOneToMany
+    public class ForeignKeyOneToMany : ForeignKeyAttribute
     {
-        
     }
 }

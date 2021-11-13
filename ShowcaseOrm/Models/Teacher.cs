@@ -21,8 +21,8 @@ namespace ShowcaseOrm.Models
         public DateTime HireDate { get; set; }
 
 
-        [ForeignKey(ColumnName = "KTEACHER")] public List<Class> Classes { get; set; } = new();
+        [ForeignKeyOneToMany(ColumnName = "KTEACHER")] public List<Class> Classes { get; set; } = new();
 
-        [ForeignKey(ColumnName = "KTEACHER")] public List<Course> Courses { get; set; } = new();
+        [ForeignKeyOneToMany(ColumnName = "KTEACHER")] public List<Course> Courses { get; set; } = new();
     }
 }

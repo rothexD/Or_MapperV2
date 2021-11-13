@@ -52,8 +52,11 @@ namespace ORMapper.Models
                     {
                         field.IsExternal = typeof(IEnumerable).IsAssignableFrom(info.PropertyType);
 
-                        field.RemoteTable = ((ForeignKeyAttribute) fattr).RemoteTableName ?? null;
-                        field.TheirReferenceToThisColumnName = ((ForeignKeyAttribute) fattr).TheirReferenceToThisColumnName;
+                        if (fattr is ForeignKeyManyToMany)
+                        {
+                            field.RemoteTable = ((ForeignKeyManyToMany) fattr).RemoteTableName;
+                            field.TheirReferenceToThisColumnName = ((ForeignKeyManyToMany) fattr).TheirReferenceToThisColumnName;
+                        }
                         field.IsManyToMany = !string.IsNullOrEmpty(field.TheirReferenceToThisColumnName);
                     }
                 }

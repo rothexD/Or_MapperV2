@@ -5,6 +5,7 @@ using NUnit.Framework;
 using FluentAssertions;
 using FakeItEasy;
 using ORMapper;
+using ORMapper.Models;
 
 namespace OrMapper.Tests
 {

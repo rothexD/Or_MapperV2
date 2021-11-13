@@ -13,9 +13,9 @@ namespace ShowcaseOrm.Show
             
             List<Type> tables = new();
             tables.Add(typeof(Gender));
-            tables.Add(typeof(STUDENT_COURSES));
             tables.Add(typeof(Course));
             tables.Add(typeof(Student));
+            tables.Add(typeof(STUDENT_COURSES));
             tables.Add(typeof(Class));
             tables.Add(typeof(Teacher));
             

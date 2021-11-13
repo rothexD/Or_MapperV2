@@ -111,7 +111,7 @@ namespace ORMapper.FluentSqlQueryApi
             }
             else
             {
-                _selectBlock += " " + first+ " ";
+                _selectBlock += " " + first + " ";
             }
 
             _selectBlock += insert + " ";

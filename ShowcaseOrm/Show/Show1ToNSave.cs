@@ -34,9 +34,8 @@ namespace ShowcaseOrm.Show
                 Name = "course example name",
                 Students = new()
             });
-            
+        
             Orm.Save(teacher1ton);
-            
             var i = Orm.Get<Teacher>("t.1");
             
             Console.WriteLine("getting teacher only");
