@@ -12,6 +12,9 @@ namespace ORMapper
 {
     public static class OrmMapping
     {
+        //Todo: add code comments
+        //Todo: add logging
+        
         /// <summary>
         ///     prints Sql Statements to console in order
         /// </summary>

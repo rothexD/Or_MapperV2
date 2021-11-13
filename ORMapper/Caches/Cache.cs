@@ -6,6 +6,8 @@ namespace ORMapper.Caches
 {
     public class Cache
     {
+        //Todo: add logging 
+        //Todo: add code comments
         public Dictionary<Type,Dictionary<object,object>> storage = new();
 
         protected virtual Dictionary<object, object> GetCache(Type t)

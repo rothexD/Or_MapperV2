@@ -1,11 +1,13 @@
 ﻿using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
 using ORMapper.FluentSqlQueryApi.IFluentSqlInterfaces;
+using ORMapper.Logging;
 
 namespace ORMapper.FluentSqlQueryApi
 {
     public class CustomQuery : ISelect, IFrom, ITypeOfWhere, IConjunction, IJoinAndWhere
     {
-        
+        private ILogger logger = CustomLogger.GetLogger<CustomQuery>();
         private string _selectBlock = "";
         private readonly List<(string, object)> _parameterList = new ();
         private int _counter = 0;

@@ -2,19 +2,25 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Common;
 using System.Linq;
-using System.Net.Http.Headers;
 using System.Transactions;
+using Microsoft.Extensions.Logging;
 using Npgsql;
 using ORMapper.Caches;
 using ORMapper.extentions;
+using ORMapper.Logging;
 using ORMapper.Models;
 
 namespace ORMapper
 {
     public static class Orm
     {
+        //Todo: improve logging
+        //Todo: add code comments
+        //Todo: code complex, improve readabiltiy
+        
+        
+        private static ILogger logger = CustomLogger.GetLogger(nameof(Orm));
         private static readonly Dictionary<Type, Table> _mappedEntities = new();
         public static string Connectionstring = "";
 
@@ -39,9 +45,11 @@ namespace ORMapper
         /// <returns>a mapped Entity</returns>
         internal static Table _GetTable(this object o)
         {
+            logger.LogDebug("entering map table");
             var t = o is Type ? (Type) o : o.GetType();
 
             if (!_mappedEntities.ContainsKey(t)) _mappedEntities.Add(t, new Table(t));
+            logger.LogDebug("returning mapped table");
             return _mappedEntities[t];
         }
 
@@ -54,14 +62,19 @@ namespace ORMapper
         /// <returns>null if not in cache, object if in cache</returns>
         public static object SearchInCache(Type findObjectOfType, object pk, ICollection<object> localcache)
         {
+            logger.LogDebug("starting search in cache");
             if (localcache != null)
                 foreach (var i in localcache)
                 {
                     if (i.GetType() != findObjectOfType) continue;
 
-                    if (findObjectOfType._GetTable().PrimaryKey.GetValue(i).Equals(pk)) return i;
+                    if (findObjectOfType._GetTable().PrimaryKey.GetValue(i).Equals(pk))
+                    {
+                        logger.LogDebug("ending search in cache, found in localcache");
+                        return i;
+                    }
                 }
-
+            logger.LogDebug("ending search in cache, not found");
             return null;
         }
 
@@ -76,6 +89,8 @@ namespace ORMapper
         internal static object _CreateObject(Type t, IDataReader reader, ICollection<object> localcache,
             bool shouldMethodUseCaching = true)
         {
+            //Todo: make easier to understand, refactor 
+            logger.LogDebug("started creating object");
             var returnObject = shouldMethodUseCaching
                 ? SearchInCache(t,
                     t._GetTable().PrimaryKey
@@ -88,6 +103,8 @@ namespace ORMapper
             {
                 returnObject = internalCache.Get(t, t._GetTable().PrimaryKey
                     .ToFieldType(reader.GetValue(reader.GetOrdinal(t._GetTable().PrimaryKey.ColumnName)), localcache));
+                logger.LogDebug("ending create object, found in internalcache");
+                return returnObject;
             }
             if (returnObject == null)
             {
@@ -136,6 +153,7 @@ namespace ORMapper
                 }
             }
             internalCache.Add(returnObject);
+            logger.LogDebug("ending create object, returning object");
             return returnObject;
         }
 
@@ -150,9 +168,15 @@ namespace ORMapper
         internal static object _CreateObject(Type t, object pk, ICollection<object> localcache,
             bool shouldMethodUseCaching = true)
         {
+            logger.LogDebug("starting create object from db");
             var returnObject = shouldMethodUseCaching ? SearchInCache(t, pk, localcache) : null;
             if (internalCache.Contains(t, pk)) returnObject = internalCache.Get(t, pk);
-            if (returnObject != null) return returnObject;
+            if (returnObject != null)
+            {
+                
+                logger.LogDebug("ending create object from db found in cache");
+                return returnObject;
+            }
 
             var con = Connection();
             con.CustomOpen();
@@ -173,6 +197,7 @@ namespace ORMapper
             //if (returnObject == null) throw new Exception("no data.");
 
             con.CloseCustom();
+            logger.LogDebug("ending create object from db found, created");
             return returnObject;
         }
 
@@ -188,6 +213,7 @@ namespace ORMapper
         private static object _CreateObjectAll(Type t, ICollection<object> localcache, object pk,
             string foreignKeyTablename, bool shouldMethodUseCaching = true)
         {
+            logger.LogDebug("started creating all objects for type");
             var con = Connection();
             con.CustomOpen();
             var command = con.CreateCommand();
@@ -202,9 +228,8 @@ namespace ORMapper
 
             var listType = typeof(List<>);
             var constructedListType = listType.MakeGenericType(t);
-            var objectlist = Activator.CreateInstance(constructedListType) as IList;
-
-
+            var objectlist = (IList) Activator.CreateInstance(constructedListType);
+            
             while (reader.Read())
             {
                 var createdObj = _CreateObject(t, reader, localcache, shouldMethodUseCaching);
@@ -217,6 +242,7 @@ namespace ORMapper
             reader.Dispose();
             command.Dispose();
             con.CloseCustom();
+            logger.LogDebug("ending creating all object for one type");
             return objectlist;
         }
 
@@ -226,6 +252,7 @@ namespace ORMapper
         /// <param name="o">object which should be stored to db</param>
         public static void Save(object o)
         {
+            logger.LogDebug("started saving of object");
             try
             {
                 using (var scope = new TransactionScope())
@@ -241,9 +268,11 @@ namespace ORMapper
             }
             catch (TransactionAbortedException e)
             {
+                logger.LogError(e,"error occured during transaction");
                 Console.WriteLine("Transaction aborted in Get: " + e.Message);
                 throw;
             }
+            logger.LogDebug("ended saving object");
         }
 
         /// <summary>
@@ -251,14 +280,19 @@ namespace ORMapper
         /// </summary>
         /// <param name="o">which object(table entry)</param>
         /// <param name="localcache"></param>
-        /// <param name="caching">should caching be used by default true (unused)</param>
         internal static void SaveInternal(object o, List<object> localcache)
         {
+            //Todo: make easier to understand, refactor 
+            logger.LogDebug("started saving of object internal");
             var ent = o._GetTable();
             var first = true;
             if (o == null) return;
 
-            if (SearchInCache(o.GetType(), o._GetTable().PrimaryKey.GetValue(o), localcache) != null) return;
+            if (SearchInCache(o.GetType(), o._GetTable().PrimaryKey.GetValue(o), localcache) != null)
+            {
+                logger.LogDebug("ending saving of an object internal, cached");
+                return;
+            }
             localcache.Add(o);
 
             var con = Connection();
@@ -311,7 +345,7 @@ namespace ORMapper
                 con.CloseCustom();
                 command.Dispose();
             }
-
+            logger.LogDebug("starting saving of object external columns");
             for (var i = 0; i < ent.Externals.Length; i++)
                 if (ent.Externals[i].IsManyToMany)
                     foreach (var x in ent.Externals[i].GetValue(o) as IEnumerable)
@@ -349,6 +383,7 @@ namespace ORMapper
                         //if (!internalCache.HasChanged(x)) continue;
                         SaveInternal(x, localcache);
                     }
+            logger.LogDebug("ended saving of an object");
         }
 
         /// <summary>
@@ -359,17 +394,20 @@ namespace ORMapper
         /// <returns></returns>
         public static T Get<T>(object pk)
         {
+            logger.LogDebug("started getting of object");
             try
             {
                 using (var scope = new TransactionScope())
                 {
                     var returnVal = (T) _CreateObject(typeof(T), pk, new List<object>());
                     scope.Complete();
+                    logger.LogDebug("ended getting of object");
                     return returnVal;
                 }
             }
             catch (TransactionAbortedException e)
             {
+                logger.LogCritical(e,"error in transaction, getting of object");
                 Console.WriteLine("Transaction aborted in Get: " + e.Message);
                 throw;
             }
@@ -383,6 +421,7 @@ namespace ORMapper
         /// <returns></returns>
         public static List<T> GetAll<T>(object pk = null)
         {
+            logger.LogDebug("started getting of all objects for type");
             try
             {
                 using (var scope = new TransactionScope())
@@ -390,11 +429,13 @@ namespace ORMapper
                     var returnVal = (List<T>) _CreateObjectAll(typeof(T), new List<object>(), pk,
                         typeof(T)._GetTable().PrimaryKey.ColumnName);
                     scope.Complete();
+                    logger.LogDebug("ending getting of all objects for type");
                     return returnVal;
                 }
             }
             catch (TransactionAbortedException e)
             {
+                logger.LogError(e,"error in transaction, getting of all objects for type");
                 Console.WriteLine("Transaction aborted in GetAll: " + e.Message);
                 throw;
             }
@@ -408,6 +449,7 @@ namespace ORMapper
         /// <typeparam name="t">table</typeparam>
         internal static void Delete(Type t, object pk)
         {
+            logger.LogDebug("started delete of object internal");
             var con = Connection();
             con.CustomOpen();
             var command = con.CreateCommand();
@@ -421,6 +463,7 @@ namespace ORMapper
             command.CustomNonQuery();
             command.Dispose();
             con.CloseCustom();
+            logger.LogDebug("ending delete of object internal");
         }
 
 
@@ -431,6 +474,7 @@ namespace ORMapper
         /// <typeparam name="T">table</typeparam>
         public static void Delete<T>(object pk)
         {
+            logger.LogDebug("started delete of object");
             try
             {
                 using (var scope = new TransactionScope())
@@ -441,9 +485,11 @@ namespace ORMapper
             }
             catch (TransactionAbortedException e)
             {
+                logger.LogError(e,"error in transaction, delete of object");
                 Console.WriteLine("Transaction aborted in Delete: " + e.Message);
                 throw;
             }
+            logger.LogDebug("ending delete of object");
         }
     }
 }

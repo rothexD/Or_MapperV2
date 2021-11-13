@@ -6,6 +6,9 @@ namespace ORMapper.Models
 {
     public class Column
     {
+        //Todo: add logging 
+        //Todo: add code comments
+        
         /// <summary>
         /// Constructor
         /// </summary>

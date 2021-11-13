@@ -10,6 +10,9 @@ namespace ORMapper.Caches
 {
     public class TrackingCache : Cache
     {
+        //Todo: add logging 
+        //Todo: add code comments
+        
         public Dictionary<Type, Dictionary<object, string>> _hashdictionary = new();
 
         private Dictionary<object, string> GetHashDictionary(Type t)

@@ -9,6 +9,9 @@ namespace ORMapper.Models
 {
     public class Table
     {   
+        //Todo: add logging
+        //Todo: add code comments
+        
         /// <summary>
         /// Constructor, parses a Table into Columns
         /// </summary>
@@ -17,7 +20,7 @@ namespace ORMapper.Models
         {
             var tattr = (TableAttribute) type.GetCustomAttribute(typeof(TableAttribute));
             Member = type;
-            var column = new List<Column>();
+            var columnList = new List<Column>();
 
 
             if (tattr == null || string.IsNullOrWhiteSpace(tattr.TableName))
@@ -33,46 +36,46 @@ namespace ORMapper.Models
             {
                 if ((IgnoreAttribute) info.GetCustomAttribute(typeof(IgnoreAttribute)) is not null) continue;
 
-                Column field = new(this);
+                Column column = new(this);
 
                 var fattr = (ColumnAttribute) info.GetCustomAttribute(typeof(ColumnAttribute));
                 if (fattr is not null)
                 {
                     if (fattr is PrimaryKeyAttribute)
                     {
-                        PrimaryKey = field;
-                        field.IsPrimaryKey = true;
+                        PrimaryKey = column;
+                        column.IsPrimaryKey = true;
                     }
 
-                    field.ColumnName = fattr?.ColumnName ?? info.Name;
-                    field.ColumnType = fattr?.ColumnType ?? info.PropertyType;
-                    field.IsNullable = fattr.Nullable;
+                    column.ColumnName = fattr?.ColumnName ?? info.Name;
+                    column.ColumnType = fattr?.ColumnType ?? info.PropertyType;
+                    column.IsNullable = fattr.Nullable;
 
-                    if (field.IsForeignKey = fattr is ForeignKeyAttribute)
+                    if (column.IsForeignKey = fattr is ForeignKeyAttribute)
                     {
-                        field.IsExternal = typeof(IEnumerable).IsAssignableFrom(info.PropertyType);
+                        column.IsExternal = typeof(IEnumerable).IsAssignableFrom(info.PropertyType);
 
                         if (fattr is ForeignKeyManyToMany)
                         {
-                            field.RemoteTable = ((ForeignKeyManyToMany) fattr).RemoteTableName;
-                            field.TheirReferenceToThisColumnName = ((ForeignKeyManyToMany) fattr).TheirReferenceToThisColumnName;
+                            column.RemoteTable = ((ForeignKeyManyToMany) fattr).RemoteTableName;
+                            column.TheirReferenceToThisColumnName = ((ForeignKeyManyToMany) fattr).TheirReferenceToThisColumnName;
                         }
-                        field.IsManyToMany = !string.IsNullOrEmpty(field.TheirReferenceToThisColumnName);
+                        column.IsManyToMany = !string.IsNullOrEmpty(column.TheirReferenceToThisColumnName);
                     }
                 }
                 else
                 {
                     if (info.GetGetMethod() == null || !info.GetGetMethod().IsPublic) continue;
-                    field.ColumnType = info.PropertyType;
-                    field.ColumnName = info.Name;
-                    field.IsNullable = false;
+                    column.ColumnType = info.PropertyType;
+                    column.ColumnName = info.Name;
+                    column.IsNullable = false;
                 }
 
-                field.Member = info;
-                column.Add(field);
+                column.Member = info;
+                columnList.Add(column);
             }
 
-            Columns = column.ToArray();
+            Columns = columnList.ToArray();
 
             Internals = Columns.Where(x => !x.IsExternal).ToArray();
             Externals = Columns.Where(x => x.IsExternal).ToArray();
