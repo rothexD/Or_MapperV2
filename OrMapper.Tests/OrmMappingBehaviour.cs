@@ -1,13 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using NUnit.Framework;
 using FluentAssertions;
-using FakeItEasy;
+using NUnit.Framework;
 using ORMapper;
-using ORMapper.Models;
 
-namespace OrMapper.Tests
+namespace TestProject1
 {
     public class Tests
     {

@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using FluentAssertions;
 using NUnit.Framework;
 using ORMapper;
 using ORMapper.Models;
 using ShowcaseOrm.Models;
 
-namespace OrMapper.Tests
+namespace TestProject1
 {
     public class OrmTests
     {

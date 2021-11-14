@@ -2,7 +2,7 @@
 using System.Data;
 using Npgsql;
 
-namespace ORMapper.Models
+namespace ORMapper.extentions
 {
     /// <summary>
     /// defines a static global counter
