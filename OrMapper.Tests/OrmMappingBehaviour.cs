@@ -4,7 +4,7 @@ using FluentAssertions;
 using NUnit.Framework;
 using ORMapper;
 
-namespace TestProject1
+namespace OrMapper.Tests
 {
     public class Tests
     {

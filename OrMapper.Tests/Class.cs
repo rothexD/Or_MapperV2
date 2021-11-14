@@ -1,7 +1,7 @@
 ﻿using ORMapper.Attributes;
 using ShowcaseOrm.Models;
 
-namespace TestProject1
+namespace OrMapper.Tests
 {
     /// <summary>This class represents a class in the school model.</summary>
     [Table(TableName = "CLASSES")]

@@ -5,7 +5,7 @@ using ORMapper;
 using ORMapper.Models;
 using ShowcaseOrm.Models;
 
-namespace TestProject1
+namespace OrMapper.Tests
 {
     public class OrmTests
     {
