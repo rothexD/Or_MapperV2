@@ -7,7 +7,7 @@ namespace ORMapper.FluentSqlQueryApi
 {
     public class CustomQuery : ISelect, IFrom, ITypeOfWhere, IConjunction, IJoinAndWhere
     {
-        private ILogger logger = CustomLogger.GetLogger<CustomQuery>();
+        private ILogger logger = CustomLoggerDependencyContainer.GetLogger<CustomQuery>();
         private string _selectBlock = "";
         private readonly List<(string, object)> _parameterList = new ();
         private int _counter = 0;

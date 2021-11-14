@@ -18,9 +18,10 @@ namespace ORMapper
         //Todo: improve logging
         //Todo: add code comments
         //Todo: code complex, improve readability
+        //Todo: IOC Logger
+        //Todo: Improve logging
         
-        
-        private static readonly ILogger _logger = CustomLogger.GetLogger(nameof(Orm));
+        private static readonly ILogger _logger = CustomLoggerDependencyContainer.GetLogger(nameof(Orm));
         private static readonly Dictionary<Type, Table> _mappedEntities = new();
         public static string ConnectionString = "";
 
