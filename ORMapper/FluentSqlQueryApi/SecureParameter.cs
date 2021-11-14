@@ -3,6 +3,9 @@ using System.Data.Common;
 
 namespace ORMapper.FluentSqlQueryApi
 {
+    /// <summary>
+    /// simple Secure paramter class that takes a parameter and returns the value or the DBNUll.Value,goal is marking an object as secure for CustomQuery
+    /// </summary>
     public class SecureParameter
     {
         private object _Parameter { get; set; }

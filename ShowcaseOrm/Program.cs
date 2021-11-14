@@ -19,7 +19,7 @@ namespace ShowcaseOrm
     {
         private static void Main(string[] args)
         {
-            Orm.Connectionstring = "Server=127.0.0.1;Port=5438;Database=school;User Id=postgres;Password=postgres;";
+            Orm.ConnectionString = "Server=127.0.0.1;Port=5438;Database=school;User Id=postgres;Password=postgres;";
             
             ShowCustomFluentQueryApi.Show();
 
