@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
-using Microsoft.Extensions.Logging.Console;
 
-namespace ORMapper.Logging
+namespace OrMapper.Logging
 {
     public static class CustomLoggerDependencyContainer
     {

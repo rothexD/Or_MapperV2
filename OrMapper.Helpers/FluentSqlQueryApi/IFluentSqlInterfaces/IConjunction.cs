@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace ORMapper.FluentSqlQueryApi.IFluentSqlInterfaces
+namespace OrMapper.Helpers.FluentSqlQueryApi.IFluentSqlInterfaces
 {
     public interface IConjunction
     {

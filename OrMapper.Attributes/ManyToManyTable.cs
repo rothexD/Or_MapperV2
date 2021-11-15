@@ -1,4 +1,4 @@
-﻿namespace ORMapper.Attributes
+﻿namespace OrMapper.Attributes
 {
     public class ManyToManyTableAttribute : TableAttribute
     {

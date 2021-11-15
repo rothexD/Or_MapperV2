@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using ORMapper.Attributes;
+using OrMapper.Attributes;
 
 namespace ORMapper.Models
 {

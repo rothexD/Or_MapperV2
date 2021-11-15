@@ -7,8 +7,8 @@ using System.Transactions;
 using Microsoft.Extensions.Logging;
 using Npgsql;
 using ORMapper.Caches;
-using ORMapper.extentions;
-using ORMapper.Logging;
+using OrMapper.Helpers.extentions;
+using OrMapper.Logging;
 using ORMapper.Models;
 
 namespace ORMapper

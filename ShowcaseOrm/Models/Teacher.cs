@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using ORMapper.Attributes;
+using OrMapper.Attributes;
 
 namespace ShowcaseOrm.Models
 {

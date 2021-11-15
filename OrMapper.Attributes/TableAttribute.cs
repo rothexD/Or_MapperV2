@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ORMapper.Attributes
+namespace OrMapper.Attributes
 {
     /// <summary>
     /// defines a class is a table

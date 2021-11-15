@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Data;
 
-namespace ORMapper.extentions
+namespace OrMapper.Helpers.extentions
 {
     public static class Parameterhelper
     {

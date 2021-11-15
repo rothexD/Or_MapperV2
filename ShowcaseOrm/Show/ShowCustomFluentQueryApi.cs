@@ -1,5 +1,5 @@
 ﻿using System;
-using ORMapper.FluentSqlQueryApi;
+using OrMapper.Helpers.FluentSqlQueryApi;
 
 namespace ShowcaseOrm.Show
 {

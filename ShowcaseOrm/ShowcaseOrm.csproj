@@ -6,6 +6,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\OrMapper.Attributes\OrMapper.Attributes.csproj" />
         <ProjectReference Include="..\ORMapper\ORMapper.csproj" />
     </ItemGroup>
 

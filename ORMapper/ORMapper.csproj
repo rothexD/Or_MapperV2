@@ -10,4 +10,10 @@
         <PackageReference Include="Npgsql" Version="6.0.0-rc.2" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\OrMapper.Attributes\OrMapper.Attributes.csproj" />
+      <ProjectReference Include="..\OrMapper.Helpers\OrMapper.Helpers.csproj" />
+      <ProjectReference Include="..\OrMapper.Logging\OrMapper.Logging.csproj" />
+    </ItemGroup>
+
 </Project>

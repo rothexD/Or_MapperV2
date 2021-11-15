@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
-using ORMapper.FluentSqlQueryApi.IFluentSqlInterfaces;
-using ORMapper.Logging;
+using OrMapper.Helpers.FluentSqlQueryApi.IFluentSqlInterfaces;
+using OrMapper.Logging;
 
-namespace ORMapper.FluentSqlQueryApi
+namespace OrMapper.Helpers.FluentSqlQueryApi
 {
     public class CustomQuery : ISelect, IFrom, ITypeOfWhere, IConjunction, IJoinAndWhere
     {

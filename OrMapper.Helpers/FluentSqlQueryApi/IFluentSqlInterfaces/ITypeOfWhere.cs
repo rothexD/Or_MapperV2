@@ -1,4 +1,4 @@
-﻿namespace ORMapper.FluentSqlQueryApi.IFluentSqlInterfaces
+﻿namespace OrMapper.Helpers.FluentSqlQueryApi.IFluentSqlInterfaces
 {
     public interface ITypeOfWhere
     {

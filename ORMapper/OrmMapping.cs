@@ -5,7 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Transactions;
 using Npgsql;
-using ORMapper.Attributes;
+using OrMapper.Attributes;
 using ORMapper.Models;
 
 namespace ORMapper

@@ -1,4 +1,4 @@
-﻿using ORMapper.Attributes;
+﻿using OrMapper.Attributes;
 using ShowcaseOrm.Models;
 
 namespace OrMapper.Tests

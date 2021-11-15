@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ORMapper.Attributes
+namespace OrMapper.Attributes
 {
     /// <summary>
     /// Defines a table is a foreignkey
