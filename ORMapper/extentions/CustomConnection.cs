@@ -7,38 +7,38 @@ namespace ORMapper.extentions
     /// <summary>
     /// defines a static global counter
     /// </summary>
-    public static class counter
+    public static class Counter
     {
-        public static int counterI;
-        public static int longTermCounter;
+        public static int CounterI;
+        public static int LongTermCounter;
     }
     /// <summary>
     /// defines a customconnection that can be used with using(){} scoping
     /// </summary>
     public class CustomConnection : IDisposable
     {
-        private IDbConnection connection;
-        private readonly string connectionstring;
+        private IDbConnection _connection;
+        private readonly string _connectionstring;
 
         
         public CustomConnection(string connectionstring)
         {
-            this.connectionstring = connectionstring;
+            this._connectionstring = connectionstring;
         }
 
         public void Dispose()
         {
-            counter.counterI--;
-            connection.Close();
+            Counter.CounterI--;
+            _connection.Close();
         }
 
         public IDbConnection Open()
         {
-            connection = new NpgsqlConnection(connectionstring);
-            connection.Open();
-            counter.counterI++;
+            _connection = new NpgsqlConnection(_connectionstring);
+            _connection.Open();
+            Counter.CounterI++;
             
-            return connection;
+            return _connection;
         }
     }
     
@@ -51,9 +51,9 @@ namespace ORMapper.extentions
         /// Decrements the global counter.counterI by 1 and closes the connection
         /// </summary>
         /// <param name="a">IDbConnection</param>
-        public static void CloseCustom(this IDbConnection a)
+        public static void Close(this IDbConnection a)
         {
-            counter.counterI--;
+            Counter.CounterI--;
             a.Close();
         }
         
@@ -61,10 +61,10 @@ namespace ORMapper.extentions
         /// increments the global counter.counterI by 1 and opens the connection
         /// </summary>
         /// <param name="a">IDbConnection</param>
-        public static void CustomOpen(this IDbConnection a)
+        public static void Open(this IDbConnection a)
         {
-            counter.counterI++;
-            counter.longTermCounter++;
+            Counter.CounterI++;
+            Counter.LongTermCounter++;
             a.Open();
         }
         

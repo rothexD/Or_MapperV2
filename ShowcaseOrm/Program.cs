@@ -40,7 +40,7 @@ namespace ShowcaseOrm
             Showcaching.Show();
             ShowCachingSaving.Show();
             
-            Console.WriteLine(counter.longTermCounter);
+            Console.WriteLine(Counter.LongTermCounter);
             
             
             ShowTransaction.Show();

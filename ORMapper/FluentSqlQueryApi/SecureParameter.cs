@@ -20,10 +20,6 @@ namespace ORMapper.FluentSqlQueryApi
 
                 return _Parameter;
             }
-            set
-            {
-                _Parameter = value;
-            }
         }
 
         public SecureParameter(object obj)

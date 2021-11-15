@@ -55,18 +55,7 @@ namespace ORMapper.Caches
             GetHashDictionary(t).Remove(pk);
             base.Remove(t, pk);
         }
-        /// <summary>
-        /// gets an hash for from storage
-        /// </summary>
-        /// <param name="obj">which hash should be gotten</param>
-        /// <returns>hash if in storage, null if not in storage</returns>
-        private string GetHashFromStorageObject(object obj)
-        {
-            var innnerDictionary = GetHashDictionary(obj.GetType());
-            if (innnerDictionary.TryGetValue(obj._GetTable().PrimaryKey.GetValue(obj), out var result)) return result;
 
-            return null;
-        }
         /// <summary>
         /// recursive calls internally
         ///
@@ -142,6 +131,18 @@ namespace ORMapper.Caches
             if (storedHash is null) return true;
 
             return parameterObjectHash != storedHash;
+        }
+        /// <summary>
+        /// gets an hash for from storage
+        /// </summary>
+        /// <param name="obj">which hash should be gotten</param>
+        /// <returns>hash if in storage, null if not in storage</returns>
+        private string GetHashFromStorageObject(object obj)
+        {
+            var innnerDictionary = GetHashDictionary(obj.GetType());
+            if (innnerDictionary.TryGetValue(obj._GetTable().PrimaryKey.GetValue(obj), out var result)) return result;
+
+            return null;
         }
     }
 }

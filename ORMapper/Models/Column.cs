@@ -123,7 +123,7 @@ namespace ORMapper.Models
         /// <returns>value in new type</returns>
         public object ToFieldType(object value, ICollection<object> localcache) //,ICollection<object> localcache
         {
-            if (IsForeignKey) return Orm._CreateObject(Type, value, localcache);
+            if (IsForeignKey) return Orm._CreateSingleObject(Type, value, localcache);
 
             if (Type == typeof(bool))
             {

@@ -29,45 +29,11 @@ namespace ORMapper
 
 
             if (SwitchConsoleOrDb)
-                print(sqlCommands);
+                _Print(sqlCommands);
             else
-                InsertIntoDb(sqlCommands);
+                _InsertIntoDb(sqlCommands);
         }
 
-        private static void InsertIntoDb(List<string> sqlCommand)
-        {
-            using (TransactionScope scope = new TransactionScope())
-            {
-                var con = Orm.Connection();
-                con.Open();
-                foreach (var x in sqlCommand)
-                {
-                    var command = con.CreateCommand();
-
-                    command.CommandText = x;
-                    command.ExecuteNonQuery();
-                    command.Dispose();
-                }
-                con.Close();
-
-                var connection = Orm.Connection();
-                connection.Open();
-                connection.ReloadTypes();
-                connection.Close();
-                scope.Complete();
-            }
-            
-        }
-
-
-        /// <summary>
-        ///     prints a list of strings to console
-        /// </summary>
-        /// <param name="sqlCommands">a list of strings in order of which they should be executed</param>
-        private static void print(List<string> sqlCommands)
-        {
-            foreach (var line in sqlCommands) Console.WriteLine(line);
-        }
 
         /// <summary>
         ///     parses enumns into a list of create strings
@@ -203,7 +169,7 @@ namespace ORMapper
 
             foreach (var y in foreginKeySqlList) sqlcommands.Add(y);
         }
-
+        
         public static string toDatabaseType(Type e)
         {
             if (e.IsEnum) return e.Name;
@@ -218,6 +184,41 @@ namespace ORMapper
 
             if (e == typeof(DateTime)) return "Timestamp";
             throw new Exception("type not recognized");
+        }
+        
+        private static void _InsertIntoDb(List<string> sqlCommand)
+        {
+            using (TransactionScope scope = new TransactionScope())
+            {
+                var con = Orm.Connection();
+                con.Open();
+                foreach (var x in sqlCommand)
+                {
+                    var command = con.CreateCommand();
+
+                    command.CommandText = x;
+                    command.ExecuteNonQuery();
+                    command.Dispose();
+                }
+                con.Close();
+
+                var connection = Orm.Connection();
+                connection.Open();
+                connection.ReloadTypes();
+                connection.Close();
+                scope.Complete();
+            }
+            
+        }
+
+
+        /// <summary>
+        ///     prints a list of strings to console
+        /// </summary>
+        /// <param name="sqlCommands">a list of strings in order of which they should be executed</param>
+        private static void _Print(List<string> sqlCommands)
+        {
+            foreach (var line in sqlCommands) Console.WriteLine(line);
         }
     }
 }

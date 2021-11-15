@@ -13,8 +13,6 @@ namespace ShowcaseOrm.Show
 
             var i = Orm.Get<Teacher>("t.2");
 
-            var a =Orm.internalCache.storage;
-            
             i.Courses[0].Students[0].Grade = 5;
             var safe = i.Courses[0].Students[0].ID;
             
