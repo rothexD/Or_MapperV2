@@ -337,7 +337,6 @@ namespace ORMapper
                     {
                         SaveInternal(ent.Internals[i].GetValue(o), localcache);
                         localcache.Add(ent.Internals[i].GetValue(o));
-                        continue;
                     }
 
                     
