@@ -1,17 +1,11 @@
 ﻿using System;
 using System.Data;
 using Npgsql;
+using OrMapper.Helpers.extentions;
 
 namespace OrMapper.Helpers
 {
-    /// <summary>
-    /// defines a static global counter
-    /// </summary>
-    public static class Counter
-    {
-        public static int CounterI;
-        public static int LongTermCounter;
-    }
+    
     /// <summary>
     /// defines a customconnection that can be used with using(){} scoping
     /// </summary>

@@ -1,4 +1,5 @@
 ﻿using System;
+using OrMapper.ExternalModels;
 using OrMapper.Helpers.FluentSqlQueryApi;
 
 namespace ShowcaseOrm.Show
@@ -12,7 +13,7 @@ namespace ShowcaseOrm.Show
             string[] test = {"a", "b"};
             (var para, string sqlstring) = CustomQuery.Create("@").Select(test).From("student")
                 .Join("hans", "hans.ID", "student.Id").Where()
-                .Equals(SecureParameter.Create(test), "test").And().Greater(2, 1).Build();
+                .Equals(CaseInsensitive.Create(SecureParameter.Create("test")) , CaseInsensitive.Create("TEST")).And().Greater(2, 1).Build();
             Console.WriteLine("sql: " + Environment.NewLine + sqlstring);
             Console.WriteLine("paras");
             para.ForEach(x => Console.WriteLine("key: " + x.Item1 + " ,Value: " + x.Item2));

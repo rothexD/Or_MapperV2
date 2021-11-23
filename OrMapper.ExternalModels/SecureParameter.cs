@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace OrMapper.Helpers.FluentSqlQueryApi
+namespace OrMapper.ExternalModels
 {
     /// <summary>
     /// simple Secure paramter class that takes a parameter and returns the value or the DBNUll.Value,goal is marking an object as secure for CustomQuery
@@ -30,5 +30,4 @@ namespace OrMapper.Helpers.FluentSqlQueryApi
             return new SecureParameter(obj);
         }
     }
-    
 }

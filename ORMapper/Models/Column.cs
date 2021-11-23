@@ -87,16 +87,16 @@ namespace ORMapper.Models
         /// <summary>
         /// transfers a object to the columntype, uses caching by default (orm->db)
         /// </summary>
-        /// <param name="value">value to be trasnformed</param>
-        /// <param name="localchache">cache in which objects can be stored and searched for</param>
+        /// <param name="value">value</param>
+        /// <param name="localCache">cache in which objects can be stored and searched for</param>
         /// <returns>transformed value </returns>
-        public object ToColumnType(object value, ICollection<object> localchache)
+        public object ToColumnType(object value, ICollection<object> localCache)
         {
             if (IsForeignKey)
             {
                 if (value == null) return null;
                 var i = value._GetTable().PrimaryKey
-                    .ToColumnType(value._GetTable().PrimaryKey.GetValue(value), localchache);
+                    .ToColumnType(value._GetTable().PrimaryKey.GetValue(value), localCache);
                 //localchache.Add(i);
                 return i;
             }
@@ -119,11 +119,11 @@ namespace ORMapper.Models
         /// transfers a object to a different type (db->orm)
         /// </summary>
         /// <param name="value"></param>
-        /// <param name="localcache"></param>
+        /// <param name="localCache"></param>
         /// <returns>value in new type</returns>
-        public object ToFieldType(object value, ICollection<object> localcache) //,ICollection<object> localcache
+        public object ToFieldType(object value, ICollection<object> localCache) //,ICollection<object> localcache
         {
-            if (IsForeignKey) return Orm._CreateSingleObject(Type, value, localcache);
+            if (IsForeignKey) return Orm._CreateSingleObject(Type, value, localCache);
 
             if (Type == typeof(bool))
             {

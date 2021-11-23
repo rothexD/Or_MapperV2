@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Transactions;
-using Npgsql;
 using OrMapper.Attributes;
 using ORMapper.Models;
 
@@ -18,17 +17,17 @@ namespace ORMapper
         /// <summary>
         ///     prints Sql Statements to console in order
         /// </summary>
-        /// <param name="Tables">Array of Types that represent Tables that should be parsed</param>
-        /// <param name="enums">Array of Types that represent Enums that should be parsed</param>
-        public static void Map(Type[] TypesToMap, bool SwitchConsoleOrDb = true)
+        /// <param name="typesToMap">Array of Types that represent Tables that should be parsed</param>
+        /// <param name="switchConsoleOrDb">print to console or try to insert into db</param>
+        public static void Map(Type[] typesToMap, bool switchConsoleOrDb = true)
         {
             List<string> sqlCommands = new();
 
-            ParseEnums(sqlCommands, TypesToMap.Where(x => x.IsEnum).ToArray());
-            ParseTables(sqlCommands, TypesToMap.Where(x => x.IsDefined(typeof(TableAttribute))).ToArray());
+            ParseEnums(sqlCommands, typesToMap.Where(x => x.IsEnum).ToArray());
+            ParseTables(sqlCommands, typesToMap.Where(x => x.IsDefined(typeof(TableAttribute))).ToArray());
 
 
-            if (SwitchConsoleOrDb)
+            if (switchConsoleOrDb)
                 _Print(sqlCommands);
             else
                 _InsertIntoDb(sqlCommands);
@@ -38,9 +37,9 @@ namespace ORMapper
         /// <summary>
         ///     parses enumns into a list of create strings
         /// </summary>
-        /// <param name="sqlcommands">list of sqlstrings which the new commands are added too</param>
+        /// <param name="sqlCommands">list of sqlstrings which the new commands are added too</param>
         /// <param name="enums">list of enums that should be parsed</param>
-        public static void ParseEnums(List<string> sqlcommands, Type[] enums)
+        public static void ParseEnums(List<string> sqlCommands, Type[] enums)
         {
             foreach (var i in enums)
             {
@@ -57,40 +56,40 @@ namespace ORMapper
                 sql += " EXCEPTION ";
                 sql += " WHEN duplicate_object THEN null; ";
                 sql += " END $$;";
-                sqlcommands.Add(sql);
+                sqlCommands.Add(sql);
             }
         }
 
         /// <summary>
         ///     parses tables into a list of create strings
         /// </summary>
-        /// <param name="sqlcommands">list of sqlstrings which the new commands are added too</param>
+        /// <param name="sqlCommands">list of sqlstrings which the new commands are added too</param>
         /// <param name="Tables">list of tables that should be parsed</param>
-        public static void ParseTables(List<string> sqlcommands, Type[] Tables)
+        public static void ParseTables(List<string> sqlCommands, Type[] Tables)
         {
             List<string> foreginKeySqlList = new();
             foreach (var i in Tables)
             {
-                if (i._GetTable().isManyToManyTable)
+                if (i._GetTable().IsManyToManyTable)
                 {
                     var createsqlscript = "Create Table IF NOT EXISTS " + i._GetTable().TableName + " (";
                     Column col1 = i._GetTable().Columns[0];
                     Column col2 = i._GetTable().Columns[1];
 
-                    createsqlscript += col1.ColumnName + " " + toDatabaseType(col1.Type);
+                    createsqlscript += col1.ColumnName + " " + ToDatabaseType(col1.Type);
                     createsqlscript += ", ";
-                    createsqlscript += col2.ColumnName + " " + toDatabaseType(col2.Type);
+                    createsqlscript += col2.ColumnName + " " + ToDatabaseType(col2.Type);
                     createsqlscript += ", ";
                     createsqlscript += "primary key("+col1.ColumnName+","+col2.ColumnName+")";
                     createsqlscript += ");";
-                    sqlcommands.Add(createsqlscript);
+                    sqlCommands.Add(createsqlscript);
                     continue;
                 }
                 var createSqlScript = "Create Table IF NOT EXISTS " + i._GetTable().TableName + " (";
                 foreach (var column in i._GetTable().Columns)
                     if (!column.IsForeignKey)
                     {
-                        createSqlScript += column.ColumnName + " " + toDatabaseType(column.Type) + " ";
+                        createSqlScript += column.ColumnName + " " + ToDatabaseType(column.Type) + " ";
                         if (!column.IsNullable) createSqlScript += " not null ";
                         if (column.IsPrimaryKey) createSqlScript += " primary key ";
 
@@ -101,7 +100,7 @@ namespace ORMapper
                         if (column.ColumnType.GetInterface(nameof(ICollection)) == null)
                         {
                             createSqlScript += column.ColumnName + " " +
-                                               toDatabaseType(column.Type._GetTable().PrimaryKey.Type) +
+                                               ToDatabaseType(column.Type._GetTable().PrimaryKey.Type) +
                                                " not null ,";
                         }
                             
@@ -164,13 +163,13 @@ namespace ORMapper
 
                 createSqlScript = createSqlScript.Trim().Trim(',');
                 createSqlScript += ");";
-                sqlcommands.Add(createSqlScript);
+                sqlCommands.Add(createSqlScript);
             }
 
-            foreach (var y in foreginKeySqlList) sqlcommands.Add(y);
+            foreach (var y in foreginKeySqlList) sqlCommands.Add(y);
         }
         
-        public static string toDatabaseType(Type e)
+        public static string ToDatabaseType(Type e)
         {
             if (e.IsEnum) return e.Name;
             if (e == typeof(string)) return "text";

@@ -7,7 +7,9 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using ORMapper;
 using ORMapper.Caches;
+using ORMapper.CustomQueryImproved;
 using OrMapper.Helpers;
+using OrMapper.Helpers.extentions;
 using ORMapper.Models;
 using ShowcaseOrm.Models;
 using ShowcaseOrm.Show;
@@ -21,7 +23,7 @@ namespace ShowcaseOrm
             Orm.ConnectionString = "Server=127.0.0.1;Port=5438;Database=school;User Id=postgres;Password=postgres;";
             
             ShowCustomFluentQueryApi.Show();
-
+            return;
             ShowMapTablesAndTypes.Show(false);
             ShowInsertStudent.Show();
             ShowModifyStudent.Show();
@@ -39,8 +41,8 @@ namespace ShowcaseOrm
             Showcaching.Show();
             ShowCachingSaving.Show();
             
-            Console.WriteLine(Counter.LongTermCounter);
-            
+            ShowHelper.Begin($"Used a total of {Counter.LongTermCounter} connections!");
+            ShowHelper.End();
             
             ShowTransaction.Show();
         }

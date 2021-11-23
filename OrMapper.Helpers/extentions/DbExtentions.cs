@@ -4,12 +4,20 @@ using System.Data;
 namespace OrMapper.Helpers.extentions
 {
     /// <summary>
+    /// defines a static global counter
+    /// </summary>
+    public static class Counter
+    {
+        public static int CounterI;
+        public static int LongTermCounter;
+    }
+    /// <summary>
     /// defines an IDbConnection extentions
     /// </summary>
     public static class DbExtentions
     {
         /// <summary>
-        /// Decrements the global counter.counterI by 1 and closes the connection
+        /// Decrements the global Counter.CounterI by 1 and closes the connection
         /// </summary>
         /// <param name="a">IDbConnection</param>
         public static void Close(this IDbConnection a)
@@ -19,7 +27,7 @@ namespace OrMapper.Helpers.extentions
         }
         
         /// <summary>
-        /// increments the global counter.counterI by 1 and opens the connection
+        /// increments the global Counter.CounterI by 1 and opens the connection
         /// </summary>
         /// <param name="a">IDbConnection</param>
         public static void Open(this IDbConnection a)

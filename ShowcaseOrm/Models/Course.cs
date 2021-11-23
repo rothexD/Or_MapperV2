@@ -23,7 +23,7 @@ namespace ShowcaseOrm.Models
         /// <summary>Gets or sets the course teacher.</summary>
         [ForeignKeyOneToOne(ColumnName = "KTEACHER")]
         public Teacher Teacher { get; set; }
-
+        
         [ForeignKeyManyToMany(RemoteTableName = typeof(STUDENT_COURSES), ColumnName = "KCOURSE", TheirReferenceToThisColumnName = "kstudent")]
         public List<Student> Students { get; set; } = new();
     }

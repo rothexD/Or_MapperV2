@@ -1,25 +1,35 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
+using ORMapper.CustomQueryImproved.IFluentSqlInterfaces;
 using OrMapper.ExternalModels;
-using OrMapper.Helpers.FluentSqlQueryApi.IFluentSqlInterfaces;
 using OrMapper.Logging;
 
-namespace OrMapper.Helpers.FluentSqlQueryApi
+namespace ORMapper.CustomQueryImproved
 {
-    public class CustomQuery : ISelect, IFrom, ITypeOfWhere, IConjunction, IJoinAndWhere
+    public class Test{
+    
+        public Test()
+        {
+            CustomQueryImproved.Create().Where()
+                .Smaller(CaseInsensitive.Create(SecureParameter.Create("small")), "big");
+        }
+    }
+    public class CustomQueryImproved : ITypeOfWhere, IConjunction, IJoinAndWhere
     {
-        private ILogger logger = CustomLoggerDependencyContainer.GetLogger<CustomQuery>();
+        private ILogger logger = CustomLoggerDependencyContainer.GetLogger<CustomQueryImproved>();
         private string _selectBlock = "";
         private readonly List<(string, object)> _parameterList = new ();
         private int _counter = 0;
         private readonly string _parameterPrefix;
+        private int _bracketCount = 0;
         
-        public static ISelect Create(string parameterPrefix = ":")
+        public static IJoinAndWhere Create(string parameterPrefix = ":")
         {
-            return new CustomQuery(parameterPrefix);
+            return new CustomQueryImproved(parameterPrefix);
         }
 
-        private CustomQuery(string parameterPrefix)
+        private CustomQueryImproved(string parameterPrefix)
         {
             _parameterPrefix = parameterPrefix;
         }
@@ -34,33 +44,15 @@ namespace OrMapper.Helpers.FluentSqlQueryApi
             _selectBlock += " OR ";
             return this;
         }
-
-        public IJoinAndWhere From(string tableName)
-        {
-            _selectBlock += " FROM " + tableName + " ";
-            return this;
-        }
-
-        public IFrom Select(string[] param)
-        {
-            this._selectBlock += "SELECT ";
-            foreach (var i in param)
-            {
-                _selectBlock += i + ", ";
-            }
-
-            this._selectBlock = _selectBlock.Trim().Trim(',');
-            return this;
-        }
-
-        public IConjunction Equals<T, T2>(T first, T2 second)
+        
+        public IConjunction Equals<T1, T2>(T1 first, T2 second)
         {
             TypeOfWhereHelper(first,second, "=");
 
             return this;
         }
 
-        public IConjunction NotEquals<T, T2>(T first, T2 second)
+        public IConjunction NotEquals<T1, T2>(T1 first, T2 second)
         {
             TypeOfWhereHelper(first,second, "!=");
             return this;
@@ -95,14 +87,40 @@ namespace OrMapper.Helpers.FluentSqlQueryApi
             TypeOfWhereHelper(first,second, "<=");
             return this;
         }
-
         public IConjunction GreaterEquals<T1, T2>(T1 first, T2 second)
         {
-            TypeOfWhereHelper(first,second, ">");
+            TypeOfWhereHelper(first,second, ">=");
 
             return this;
         }
 
+        public ITypeOfWhere BracketOpen_()
+        {
+            _selectBlock += "(";
+            _bracketCount++;
+            return this;
+        }
+        public ITypeOfWhere BracketClose_()
+        {
+            _selectBlock += ")";
+            _bracketCount--;
+            return this;
+        }
+        public IConjunction BracketOpen()
+        {
+            _selectBlock += "(";
+            _bracketCount++;
+            return this;
+        }
+        public IConjunction BracketClose()
+        {
+            _selectBlock += ")";
+            _bracketCount--;
+            return this;
+        }
+        
+        
+ 
         public ITypeOfWhere Where()
         {
             _selectBlock += " WHERE ";
@@ -110,14 +128,14 @@ namespace OrMapper.Helpers.FluentSqlQueryApi
         }
         
 
-        private void TypeOfWhereHelper<T, C>(T first, C second, string insert)
+        private void TypeOfWhereHelper<T1, T2>(T1 first, T2 second, string insert)
         {
             TypeOfWhereParameterHelper(first);
             _selectBlock += insert + " ";
             TypeOfWhereParameterHelper(second);
         }
 
-        private void TypeOfWhereParameterHelper<T>(T para)
+        private void TypeOfWhereParameterHelper<T1>(T1 para)
         {
             if (para is CaseInsensitive external)
             {
@@ -137,34 +155,14 @@ namespace OrMapper.Helpers.FluentSqlQueryApi
             }
         }
         
-
-        private void JoinHelper(string joinStatement, string tableName, string compareLeft, string compareRight)
+        public IList<T> GetAllMatches<T>()
         {
-            _selectBlock += joinStatement + " " + tableName + " on " + compareLeft + " = " + compareRight;
-        }
-        public IJoinAndWhere InnerJoin(string tableName, string compareLeft, string compareRight)
-        {
-            JoinHelper("inner join", tableName, compareLeft, compareRight);
-            return this;
-        }
-        public IJoinAndWhere RightJoin(string tableName, string compareLeft, string compareRight)
-        {
-            JoinHelper("right join", tableName, compareLeft, compareRight);
-            return this;
-        }
-        public IJoinAndWhere LeftJoin(string tableName, string compareLeft, string compareRight)
-        {
-            JoinHelper("left join", tableName, compareLeft, compareRight);
-            return this;
-        }
-        public IJoinAndWhere Join(string tableName, string compareLeft, string compareRight)
-        {
-            JoinHelper("inner join", tableName, compareLeft, compareRight);
-            return this;
-        }
-        public (List<(string,object)>, string) Build()
-        {
-            return (this._parameterList, this._selectBlock);
+            if (_bracketCount != 0)
+            {
+                throw new Exception("mismatching open and close in query");
+            }
+            ///Type t, ICollection<object> localCache, (string,List<(string, object)>) first
+            return (List<T>) Orm._CreateObjectAll(typeof(T), new List<object>(), (_selectBlock, _parameterList));
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace OrMapper.Helpers.FluentSqlQueryApi.IFluentSqlInterfaces
+﻿namespace ORMapper.CustomQueryImproved.IFluentSqlInterfaces
 {
     public interface ITypeOfWhere
     {
@@ -10,6 +10,8 @@
         public IConjunction SmallerEquals<T1, T2>(T1 first, T2 second);
         public IConjunction GreaterEquals<T1, T2>(T1 first, T2 second);
         public IConjunction NotLike<T1, T2>(T1 first, T2 second);
-    
+        public ITypeOfWhere BracketClose_();
+        public ITypeOfWhere BracketOpen_();
+
     }
 }

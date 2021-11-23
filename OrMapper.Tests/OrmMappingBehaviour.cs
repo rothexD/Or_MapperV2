@@ -23,7 +23,7 @@ namespace OrMapper.Tests
         {
             string result;
 
-            result = OrmMapping.toDatabaseType(typeof(int));
+            result = OrmMapping.ToDatabaseType(typeof(int));
 
             result.ToLower().Should().Be("integer");
         }
@@ -32,7 +32,7 @@ namespace OrMapper.Tests
         {
             string result;
 
-            result = OrmMapping.toDatabaseType(typeof(short));
+            result = OrmMapping.ToDatabaseType(typeof(short));
 
             result.ToLower().Should().Be("smallint");
         }
@@ -41,7 +41,7 @@ namespace OrMapper.Tests
         {
             string result;
 
-            result = OrmMapping.toDatabaseType(typeof(long));
+            result = OrmMapping.ToDatabaseType(typeof(long));
 
             result.ToLower().Should().Be("bigint");
         }
@@ -50,7 +50,7 @@ namespace OrMapper.Tests
         {
             string result;
 
-            result = OrmMapping.toDatabaseType(typeof(float));
+            result = OrmMapping.ToDatabaseType(typeof(float));
 
             result.ToLower().Should().Be("numeric");
         }
@@ -59,7 +59,7 @@ namespace OrMapper.Tests
         {
             string result;
 
-            result = OrmMapping.toDatabaseType(typeof(double));
+            result = OrmMapping.ToDatabaseType(typeof(double));
 
             result.ToLower().Should().Be("numeric");
         }
@@ -68,7 +68,7 @@ namespace OrMapper.Tests
         {
             string result;
 
-            result = OrmMapping.toDatabaseType(typeof(string));
+            result = OrmMapping.ToDatabaseType(typeof(string));
 
             result.ToLower().Should().Be("text");
         }
@@ -77,7 +77,7 @@ namespace OrMapper.Tests
         {
             string result;
 
-            result = OrmMapping.toDatabaseType(typeof(char));
+            result = OrmMapping.ToDatabaseType(typeof(char));
 
             result.ToLower().Should().Be("text");
         }
@@ -86,7 +86,7 @@ namespace OrMapper.Tests
         {
             string result;
 
-            result = OrmMapping.toDatabaseType(typeof(DateTime));
+            result = OrmMapping.ToDatabaseType(typeof(DateTime));
 
             result.ToLower().Should().Be("timestamp");
         }
@@ -95,7 +95,7 @@ namespace OrMapper.Tests
         {
             Action act;
             
-            act = () => OrmMapping.toDatabaseType(typeof(SystemException));
+            act = () => OrmMapping.ToDatabaseType(typeof(SystemException));
 
             act.Should().Throw<Exception>();
         }

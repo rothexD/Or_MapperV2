@@ -9,6 +9,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\OrMapper.ExternalModels\OrMapper.ExternalModels.csproj" />
       <ProjectReference Include="..\OrMapper.Logging\OrMapper.Logging.csproj" />
     </ItemGroup>
 

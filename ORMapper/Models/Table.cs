@@ -30,7 +30,7 @@ namespace ORMapper.Models
             
             //is as many to many table defined ?
             if (tattr != null)
-                isManyToManyTable = tattr.isManyToManyTable;
+                IsManyToManyTable = tattr.IsManyToManyTable;
             
             foreach (var info in type.GetProperties(
                 BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
@@ -95,7 +95,7 @@ namespace ORMapper.Models
         public Column[] Externals { get; set; }
         public Column[] Internals { get; set; }
 
-        public bool isManyToManyTable { get; set; } = false;
+        public bool IsManyToManyTable { get; set; } = false;
         /// <summary>
         /// gets a basic select * from table statement
         /// </summary>

@@ -4,7 +4,7 @@
     {
         public ManyToManyTableAttribute()
         {
-            isManyToManyTable = true;
+            IsManyToManyTable = true;
         }
     }
 }

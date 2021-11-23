@@ -347,7 +347,10 @@ namespace ORMapper
                 ? t._GetTable().GetSelectSql(null)
                 : t._GetTable().GetSelectSql(null) + " Where " + foreignKeyTablename + " = :pk";
 
+            
 
+            
+            
             command.HelpWithParameter(":pk", pk);
             var reader = DbExtentions.ExecuteReader(command);
 
@@ -373,6 +376,43 @@ namespace ORMapper
             return objectlist;
         }
 
+        internal static object _CreateObjectAll(Type t, ICollection<object> localCache, (string,List<(string, object)>) first)
+        {
+            _logger.LogDebug("started creating all objects for type");
+            var con = Connection();
+            DbExtentions.Open(con);
+            var command = con.CreateCommand();
+
+            command.CommandText = t._GetTable().GetSelectSql(null) + first.Item1;
+
+            foreach (var item in first.Item2)
+            {
+                command.HelpWithParameter(item.Item1,item.Item2);
+            }
+            
+            var reader = DbExtentions.ExecuteReader(command);
+
+            //create list for Type
+            var listType = typeof(List<>);
+            var constructedListType = listType.MakeGenericType(t);
+            var objectlist = (IList) Activator.CreateInstance(constructedListType);
+            
+            // fill list with objects
+            while (reader.Read())
+            {
+                var createdObj = _CreateObject(t, reader, localCache, true);
+                _internalCache.Add(createdObj);
+                objectlist.Add(createdObj);
+            }
+
+
+            reader.Close();
+            reader.Dispose();
+            command.Dispose();
+            DbExtentions.Close(con);
+            _logger.LogDebug("ending creating all object for one type");
+            return objectlist;
+        }
 
         /// <summary>
         ///     saves or updates an object to datebase
