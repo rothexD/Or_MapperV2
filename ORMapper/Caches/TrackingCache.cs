@@ -92,7 +92,7 @@ namespace ORMapper.Caches
                     rval += i.ColumnName + "=" + i.GetValue(obj) + ";";
                 }
             //hash externals
-            foreach (var i in obj._GetTable().Externals)
+            /*foreach (var i in obj._GetTable().Externals)
             {
                 var m = (IEnumerable) i.GetValue(obj);
 
@@ -110,7 +110,7 @@ namespace ORMapper.Caches
                         rval += CalculateHash(k, localcache);
                     }
                 }
-            }
+            }*/
 
             //Console.WriteLine(rval);
             return Encoding.UTF8.GetString(SHA256.Create().ComputeHash(Encoding.UTF8.GetBytes(rval)));

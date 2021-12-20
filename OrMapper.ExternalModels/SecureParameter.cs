@@ -27,6 +27,14 @@ namespace OrMapper.ExternalModels
         }
         public static SecureParameter Create(object obj)
         {
+            if (obj is SecureParameter)
+            {
+                throw new ArgumentException("obj is already secure");
+            }
+            if (obj is CaseInsensitive)
+            {
+                throw new ArgumentException("Caseinsensitive obj cant be secureparameter");
+            }
             return new SecureParameter(obj);
         }
     }

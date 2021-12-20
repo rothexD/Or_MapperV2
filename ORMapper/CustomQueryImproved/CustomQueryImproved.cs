@@ -7,14 +7,6 @@ using OrMapper.Logging;
 
 namespace ORMapper.CustomQueryImproved
 {
-    public class Test{
-    
-        public Test()
-        {
-            CustomQueryImproved.Create().Where()
-                .Smaller(CaseInsensitive.Create(SecureParameter.Create("small")), "big");
-        }
-    }
     public class CustomQueryImproved : ITypeOfWhere, IConjunction, IJoinAndWhere
     {
         private ILogger logger = CustomLoggerDependencyContainer.GetLogger<CustomQueryImproved>();
@@ -161,7 +153,7 @@ namespace ORMapper.CustomQueryImproved
             {
                 throw new Exception("mismatching open and close in query");
             }
-            ///Type t, ICollection<object> localCache, (string,List<(string, object)>) first
+            ///Type t, ICollection<object> localCache, (string,List<(string, object)>) firs
             return (List<T>) Orm._CreateObjectAll(typeof(T), new List<object>(), (_selectBlock, _parameterList));
         }
     }

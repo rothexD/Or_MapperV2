@@ -14,7 +14,7 @@ namespace OrMapper.Helpers.FluentSqlQueryApi
         private int _counter = 0;
         private readonly string _parameterPrefix;
         
-        public static ISelect Create(string parameterPrefix = ":")
+        public static ISelect Create(string parameterPrefix = "@")
         {
             return new CustomQuery(parameterPrefix);
         }

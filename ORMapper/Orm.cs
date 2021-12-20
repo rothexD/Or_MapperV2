@@ -438,6 +438,7 @@ namespace ORMapper
             //if object has changed, save internals
             if (_internalCache.HasChanged(o))
             {
+                _internalCache.Add(o);
                 //save object internals
                 var con = Connection();
 
@@ -445,7 +446,7 @@ namespace ORMapper
                 command.CommandText = $"Insert into {ent.TableName} (";
                 var update = " ON CONFLICT (" + ent.PrimaryKey.ColumnName + ") DO UPDATE SET ";
                 var insert = "";
-                _internalCache.Add(o);
+                
                 for (var i = 0; i < ent.Internals.Length; i++)
                 {
                     if (i > 0)
@@ -518,9 +519,9 @@ namespace ORMapper
                         var y3 = y2.GetValue(o);
 
                         command.HelpWithParameter(":para2", y3);
-                        DbExtentions.Open(con2);
-                        DbExtentions.ExecuteNonQuery(command);
-                        DbExtentions.Close(con2);
+                        con2.Open();
+                        command.ExecuteNonQuery();
+                        con2.Close();
                         con2.Dispose();
                     }
                 else

@@ -21,9 +21,7 @@ namespace ShowcaseOrm
         private static void Main(string[] args)
         {
             Orm.ConnectionString = "Server=127.0.0.1;Port=5438;Database=school;User Id=postgres;Password=postgres;";
-            
-            ShowCustomFluentQueryApi.Show();
-            return;
+
             ShowMapTablesAndTypes.Show(false);
             ShowInsertStudent.Show();
             ShowModifyStudent.Show();
@@ -43,7 +41,8 @@ namespace ShowcaseOrm
             
             ShowHelper.Begin($"Used a total of {Counter.LongTermCounter} connections!");
             ShowHelper.End();
-            
+
+            ShowCustomFluentQueryImproved.Show();
             ShowTransaction.Show();
         }
     }

@@ -17,12 +17,13 @@ namespace ShowcaseOrm.Show
 
             var b = Orm.Get<Teacher>("t.0");
             b.Name = "zappelfisch";
+            b.Salary = 40000;
             Console.WriteLine("should print a insert");
             Orm.Save(b);
             
             
             var c = Orm.Get<Teacher>("t.0");
-            c.Courses[0].Name = "zappelfisch";
+            c.Courses[0].Name = "Banane";
             Console.WriteLine("should print a insert modified in depth");
             Orm.Save(c);
             
