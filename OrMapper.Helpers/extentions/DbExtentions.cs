@@ -3,14 +3,7 @@ using System.Data;
 
 namespace OrMapper.Helpers.extentions
 {
-    /// <summary>
-    /// defines a static global counter
-    /// </summary>
-    public static class Counter
-    {
-        public static int CounterI;
-        public static int LongTermCounter;
-    }
+
     /// <summary>
     /// defines an IDbConnection extentions
     /// </summary>
@@ -33,7 +26,7 @@ namespace OrMapper.Helpers.extentions
         public static void Open(this IDbConnection a)
         {
             Counter.CounterI++;
-            Counter.LongTermCounter++;
+            Counter.IncrementLongTermCounter();
             a.Open();
         }
         

@@ -9,5 +9,6 @@ namespace ORMapper.CustomQueryImproved.IFluentSqlInterfaces
         public IList<T> GetAllMatches<T>();
         public IConjunction BracketClose();
         public IConjunction BracketOpen();
+        public (string, List<(string, object)>) OutputResult();
     }
 }

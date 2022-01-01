@@ -23,5 +23,8 @@ namespace OrMapper.Tests
         /// <summary>Gets or sets the class teacher.</summary>
         [ForeignKey(ColumnName = "KTEACHER")]
         public Teacher Teacher { get; set; }
+        
+        [ForeignKeyManyToMany(RemoteTableName = typeof(STUDENT_COURSES), ColumnName = "kstudent", TheirReferenceToThisColumnName = "kcourse")]
+        public Teacher Teacher2 { get; set; }
     }
 }

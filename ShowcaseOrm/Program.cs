@@ -20,9 +20,10 @@ namespace ShowcaseOrm
     {
         private static void Main(string[] args)
         {
-            Orm.ConnectionString = "Server=127.0.0.1;Port=5438;Database=school;User Id=postgres;Password=postgres;";
+            Orm.ConnectionString = "Server=127.0.0.1;Port=5432;Database=remote;User Id=remote_user;Password=remote_password;";
 
-            ShowMapTablesAndTypes.Show(false);
+            ShowMapTablesAndTypes.Show(true);
+            
             ShowInsertStudent.Show();
             ShowModifyStudent.Show();
 
@@ -39,10 +40,12 @@ namespace ShowcaseOrm
             Showcaching.Show();
             ShowCachingSaving.Show();
             
+            ShowCustomFluentQueryImproved.Show();
+            
             ShowHelper.Begin($"Used a total of {Counter.LongTermCounter} connections!");
             ShowHelper.End();
-
-            ShowCustomFluentQueryImproved.Show();
+            
+            //transactions are supported with transaction scope.. not self implemented
             ShowTransaction.Show();
         }
     }

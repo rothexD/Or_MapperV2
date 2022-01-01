@@ -10,13 +10,13 @@ namespace ShowcaseOrm.Show
     {
         public static void Show()
         {
-            ShowHelper.Begin("Showing with integer");
+            ShowHelper.Begin("Showing customfluentquery with integer");
             var x = CustomQueryImproved.Create().Where()
                 .Equals("Salary",SecureParameter.Create(50000)).GetAllMatches<Teacher>();
             ShowHelper.printNewtonsoftJson(x);    
             
             
-            ShowHelper.Begin("Showing with caseinsentive name");
+            ShowHelper.Begin("Showing customfluentquery with caseinsentive name");
             var y = CustomQueryImproved.Create().Where()
                 .Equals("Name","ZAPPELFISCH".MakeSecure().MakeCaseIns()).GetAllMatches<Teacher>();
             ShowHelper.printNewtonsoftJson(y);

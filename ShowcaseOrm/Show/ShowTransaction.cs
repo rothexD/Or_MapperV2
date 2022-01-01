@@ -4,6 +4,10 @@ namespace ShowcaseOrm.Show
 {
     public static class ShowTransaction
     {
+        /// <summary>
+        /// uses transaction scope not self implemented
+        /// </summary>
+        /// <exception cref="NotImplementedException"></exception>
         public static void Show()
         {
             ShowHelper.Begin("Showing transactions");

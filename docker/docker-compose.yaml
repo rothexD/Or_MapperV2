@@ -1,0 +1,12 @@
+version: '3.3'
+services:
+  db:
+    image: postgres
+    restart: unless-stopped
+    container_name: remotecompiler_postgres
+    environment:
+      POSTGRES_PASSWORD: 'remote_password'
+      POSTGRES_USER: 'remote_user'
+      POSTGRES_DB: 'remote'
+    ports:
+      - '5432:5432'

@@ -7,7 +7,7 @@ namespace ShowcaseOrm.Show
 {
     public class ShowMapTablesAndTypes
     {
-        public static void Show(bool PrintToConsole = false)
+        public static void Show(bool automaticInsertIntoDb = false)
         {
             ShowHelper.Begin("Showing OrMapping");
             
@@ -19,7 +19,12 @@ namespace ShowcaseOrm.Show
             tables.Add(typeof(Class));
             tables.Add(typeof(Teacher));
             
-            OrmMapping.Map(tables.ToArray(),PrintToConsole);
+            var x =OrmMapping.Map(tables.ToArray(),automaticInsertIntoDb);
+            OrmMapping.ReloadTypes();
+            //if set to false:
+            //OrmMapping._Print(x);
+            //
+            
             
             ShowHelper.End();
         }

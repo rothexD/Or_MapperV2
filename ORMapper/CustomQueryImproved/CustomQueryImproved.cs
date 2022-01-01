@@ -7,9 +7,11 @@ using OrMapper.Logging;
 
 namespace ORMapper.CustomQueryImproved
 {
+    /// <summary>
+    /// provides a custom sql query filter fluent api
+    /// </summary>
     public class CustomQueryImproved : ITypeOfWhere, IConjunction, IJoinAndWhere
     {
-        private ILogger logger = CustomLoggerDependencyContainer.GetLogger<CustomQueryImproved>();
         private string _selectBlock = "";
         private readonly List<(string, object)> _parameterList = new ();
         private int _counter = 0;
@@ -146,15 +148,23 @@ namespace ORMapper.CustomQueryImproved
                 _selectBlock += " " + para + " ";
             }
         }
-        
+        /// <summary>
+        /// creates object list for requested sql
+        /// </summary>
+        /// <typeparam name="T">requested type</typeparam>
+        /// <returns>IList of requested Type</returns>
+        /// <exception cref="Exception">mismatch in bracketcount</exception>
         public IList<T> GetAllMatches<T>()
         {
             if (_bracketCount != 0)
             {
                 throw new Exception("mismatching open and close in query");
             }
-            ///Type t, ICollection<object> localCache, (string,List<(string, object)>) firs
             return (List<T>) Orm._CreateObjectAll(typeof(T), new List<object>(), (_selectBlock, _parameterList));
+        }
+        public (string,List<(string, object)>) OutputResult()
+        {
+            return (_selectBlock, _parameterList);
         }
     }
 }

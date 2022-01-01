@@ -66,9 +66,9 @@ namespace OrMapper.Tests
             result = new Table(typeof(Class));
 
             result.TableName.Should().Be("CLASSES");
-            result.Columns.Should().HaveCount(3);
+            result.Columns.Should().HaveCount(4);
             result.Member.Should().Be(typeof(Class));
-            result.Internals.Should().HaveCount(3);
+            result.Internals.Should().HaveCount(4);
 
             result.Internals[0].ColumnName.Should().Be("ID");
             result.Internals[0].IsPrimaryKey.Should().BeTrue();
@@ -102,7 +102,8 @@ namespace OrMapper.Tests
             
             sql = obj.GetSelectSql("");
 
-            sql.Should().Be("Select ID, Name, KTEACHER From CLASSES");
+            sql.Should().Be("Select ID, Name, KTEACHER, kstudent From CLASSES");
         }
+
     }
 }

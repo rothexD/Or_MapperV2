@@ -8,8 +8,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrMapper.Tests", "OrMapper.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrMapper.Helpers", "OrMapper.Helpers\OrMapper.Helpers.csproj", "{699F7458-8127-4DD8-AA2B-FDB7E8E1E591}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrMapper.Logging", "OrMapper.Logging\OrMapper.Logging.csproj", "{234AF688-A0E8-411D-A5BA-6CF0ADD5E47A}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrMapper.Attributes", "OrMapper.Attributes\OrMapper.Attributes.csproj", "{7D995DA7-9100-4055-8538-DBD7F0885600}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrMapper.ExternalModels", "OrMapper.ExternalModels\OrMapper.ExternalModels.csproj", "{D07401F8-27B1-4B28-B6E8-2E0FFA6A417A}"
@@ -36,10 +34,6 @@ Global
 		{699F7458-8127-4DD8-AA2B-FDB7E8E1E591}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{699F7458-8127-4DD8-AA2B-FDB7E8E1E591}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{699F7458-8127-4DD8-AA2B-FDB7E8E1E591}.Release|Any CPU.Build.0 = Release|Any CPU
-		{234AF688-A0E8-411D-A5BA-6CF0ADD5E47A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{234AF688-A0E8-411D-A5BA-6CF0ADD5E47A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{234AF688-A0E8-411D-A5BA-6CF0ADD5E47A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{234AF688-A0E8-411D-A5BA-6CF0ADD5E47A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7D995DA7-9100-4055-8538-DBD7F0885600}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7D995DA7-9100-4055-8538-DBD7F0885600}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7D995DA7-9100-4055-8538-DBD7F0885600}.Release|Any CPU.ActiveCfg = Release|Any CPU

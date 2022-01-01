@@ -8,10 +8,8 @@ using OrMapper.Attributes;
 namespace ORMapper.Models
 {
     public class Table
-    {   
-        //Todo: add logging
-        //Todo: add code comments
-        
+    {
+
         /// <summary>
         /// Constructor, parses a Table into Columns
         /// </summary>

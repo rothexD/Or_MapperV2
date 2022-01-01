@@ -9,9 +9,6 @@ namespace ORMapper.Caches
 {
     public class TrackingCache : Cache
     {
-        //Todo: add logging 
-        //Todo: add code comments
-
         public Dictionary<Type, Dictionary<object, string>> _hashdictionary = new();
         
         /// <summary>
@@ -43,7 +40,7 @@ namespace ORMapper.Caches
         {
             var innnerDictionary = GetHashDictionary(obj.GetType());
             innnerDictionary.Remove(obj._GetTable().PrimaryKey.GetValue(obj));
-            base.Add(obj);
+            base.Remove(obj);
         }
         /// <summary>
         /// removes an hash of type and primary key, calls base method remove wit htype and pk
@@ -111,7 +108,6 @@ namespace ORMapper.Caches
                     }
                 }
             }*/
-
             //Console.WriteLine(rval);
             return Encoding.UTF8.GetString(SHA256.Create().ComputeHash(Encoding.UTF8.GetBytes(rval)));
         }

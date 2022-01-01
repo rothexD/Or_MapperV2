@@ -6,8 +6,6 @@ namespace ORMapper.Caches
 {
     public class Cache
     {
-        //Todo: add logging 
-        //Todo: add code comments
         public Dictionary<Type,Dictionary<object,object>> storage = new();
 
         /// <summary>
@@ -70,6 +68,7 @@ namespace ORMapper.Caches
         public virtual void Remove(Type t,object pk)
         {
             GetCache(t).Remove(pk);
+            
         }
         /// <summary>
         /// asks if an object has changed, base cache cant track changes and always returns true

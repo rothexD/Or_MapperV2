@@ -1,25 +1,25 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Reflection;
 using System.Transactions;
+using Npgsql;
 using OrMapper.Attributes;
 using ORMapper.Models;
+using OrMapper.Helpers.extentions;
 
 namespace ORMapper
 {
     public static class OrmMapping
     {
-        //Todo: add code comments
-        //Todo: add logging
-        
         /// <summary>
         ///     prints Sql Statements to console in order
         /// </summary>
         /// <param name="typesToMap">Array of Types that represent Tables that should be parsed</param>
-        /// <param name="switchConsoleOrDb">print to console or try to insert into db</param>
-        public static void Map(Type[] typesToMap, bool switchConsoleOrDb = true)
+        /// <param name="automaticInsertIntoDb">print to console or try to insert into db</param>
+        public static List<string> Map(Type[] typesToMap, bool automaticInsertIntoDb = false)
         {
             List<string> sqlCommands = new();
 
@@ -27,10 +27,10 @@ namespace ORMapper
             ParseTables(sqlCommands, typesToMap.Where(x => x.IsDefined(typeof(TableAttribute))).ToArray());
 
 
-            if (switchConsoleOrDb)
-                _Print(sqlCommands);
-            else
+            if (automaticInsertIntoDb)
                 _InsertIntoDb(sqlCommands);
+            
+            return sqlCommands;
         }
 
 
@@ -184,12 +184,14 @@ namespace ORMapper
             if (e == typeof(DateTime)) return "Timestamp";
             throw new Exception("type not recognized");
         }
-        
-        private static void _InsertIntoDb(List<string> sqlCommand)
+        public static void _InsertIntoDb(List<string> sqlCommand,IDbConnection con = null)
         {
             using (TransactionScope scope = new TransactionScope())
             {
-                var con = Orm.Connection();
+                if (con is null)
+                {
+                    con = Orm.Connection();
+                }
                 con.Open();
                 foreach (var x in sqlCommand)
                 {
@@ -200,22 +202,21 @@ namespace ORMapper
                     command.Dispose();
                 }
                 con.Close();
-
-                var connection = Orm.Connection();
-                connection.Open();
-                connection.ReloadTypes();
-                connection.Close();
                 scope.Complete();
             }
-            
         }
-
-
+        public static void ReloadTypes()
+        {
+            var connection = Orm.Connection();
+            connection.Open();
+            connection.ReloadTypes();
+            connection.Close();
+        }
         /// <summary>
         ///     prints a list of strings to console
         /// </summary>
         /// <param name="sqlCommands">a list of strings in order of which they should be executed</param>
-        private static void _Print(List<string> sqlCommands)
+        public static void _Print(List<string> sqlCommands)
         {
             foreach (var line in sqlCommands) Console.WriteLine(line);
         }

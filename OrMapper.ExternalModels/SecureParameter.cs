@@ -3,7 +3,7 @@
 namespace OrMapper.ExternalModels
 {
     /// <summary>
-    /// simple Secure paramter class that takes a parameter and returns the value or the DBNUll.Value,goal is marking an object as secure for CustomQuery
+    /// Secure paramter class that takes a parameter and returns the value or the DBNUll.Value,goal is marking an object as secure for CustomQuery
     /// </summary>
     public class SecureParameter
     {
