@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using OrMapper.Attributes;
 using ShowcaseOrm.Models;
 
-namespace OrMapper.Tests
+namespace OrMapper.Tests.TestClasses
 {
     /// <summary>This is a teacher implementation (from School example).</summary>
     [Table(TableName = "TEACHERS")]

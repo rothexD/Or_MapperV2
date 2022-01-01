@@ -5,6 +5,7 @@ using NUnit.Framework;
 using ORMapper;
 using ORMapper.CustomQueryImproved;
 using OrMapper.ExternalModels;
+using OrMapper.Helpers.extentions;
 
 namespace OrMapper.Tests
 {

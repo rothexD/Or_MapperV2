@@ -4,6 +4,8 @@ using NUnit.Framework;
 using ORMapper;
 using ORMapper.Models;
 using ShowcaseOrm.Models;
+using Class = OrMapper.Tests.TestClasses.Class;
+using Teacher = OrMapper.Tests.TestClasses.Teacher;
 
 namespace OrMapper.Tests
 {

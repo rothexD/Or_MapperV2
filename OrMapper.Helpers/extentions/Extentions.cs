@@ -1,4 +1,6 @@
-﻿namespace OrMapper.ExternalModels
+﻿using OrMapper.ExternalModels;
+
+namespace OrMapper.Helpers.extentions
 {
     public static class Extentions
     {

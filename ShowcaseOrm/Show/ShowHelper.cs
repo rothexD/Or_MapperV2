@@ -17,10 +17,6 @@ namespace ShowcaseOrm.Show
         public static void End()
         {
             Console.WriteLine();
-            return;
-            Console.WriteLine("----------------------------------------------------------------------------------------------");
-            Console.WriteLine("----------------------------------------------------------------------------------------------");
-            Console.WriteLine();
         }
 
         public static void printNewtonsoftJson(object o)

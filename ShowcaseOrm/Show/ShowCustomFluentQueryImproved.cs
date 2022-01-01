@@ -1,7 +1,7 @@
 ﻿using System;
 using ORMapper.CustomQueryImproved;
 using OrMapper.ExternalModels;
-using OrMapper.Helpers.FluentSqlQueryApi;
+using OrMapper.Helpers.extentions;
 using ShowcaseOrm.Models;
 
 namespace ShowcaseOrm.Show

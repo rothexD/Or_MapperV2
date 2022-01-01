@@ -7,6 +7,7 @@ using Npgsql;
 using NUnit.Framework;
 using ORMapper;
 using ORMapper.Models;
+using OrMapper.Tests.TestClasses;
 
 namespace OrMapper.Tests
 {

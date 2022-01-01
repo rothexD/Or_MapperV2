@@ -13,7 +13,6 @@
     <ItemGroup>
       <ProjectReference Include="..\OrMapper.Attributes\OrMapper.Attributes.csproj" />
       <ProjectReference Include="..\OrMapper.Helpers\OrMapper.Helpers.csproj" />
-      <ProjectReference Include="..\OrMapper.Logging\OrMapper.Logging.csproj" />
     </ItemGroup>
 
 </Project>

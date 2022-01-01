@@ -3,6 +3,7 @@ using FluentAssertions;
 using NUnit.Framework;
 using ORMapper.Caches;
 using ORMapper.Models;
+using OrMapper.Tests.TestClasses;
 
 namespace OrMapper.Tests
 {

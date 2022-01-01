@@ -2,6 +2,7 @@
 using FluentAssertions;
 using NUnit.Framework;
 using ORMapper.Caches;
+using OrMapper.Tests.TestClasses;
 
 namespace OrMapper.Tests
 {

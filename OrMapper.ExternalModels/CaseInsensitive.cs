@@ -7,15 +7,22 @@ namespace OrMapper.ExternalModels
     /// </summary>
     public class CaseInsensitive
     {
-        public object Parameter { get; private set; }
+        private object _Parameter { get; set; }
+        public object Parameter
+        {
+            get
+            {
+                if (_Parameter is null)
+                {
+                    return DBNull.Value;
+                }
 
+                return _Parameter;
+            }
+        }
         public CaseInsensitive(object obj)
         {
-            if (obj is null)
-            {
-                throw new Exception("obj para was null");
-            }
-            Parameter = obj;
+            _Parameter = obj;
         }
         public static CaseInsensitive Create(object obj)
         {

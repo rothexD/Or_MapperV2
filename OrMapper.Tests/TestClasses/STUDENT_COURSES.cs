@@ -1,6 +1,6 @@
 ﻿using OrMapper.Attributes;
 
-namespace OrMapper.Tests
+namespace OrMapper.Tests.TestClasses
 {
     [ManyToManyTable]
     public class STUDENT_COURSES
