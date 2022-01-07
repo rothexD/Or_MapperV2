@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using ORMapper;
 using ShowcaseOrm.Models;
 
 namespace ShowcaseOrm.Show
 {
+    [ExcludeFromCodeCoverage]
     public class ShowMapTablesAndTypes
     {
         public static void Show(bool automaticInsertIntoDb = false)

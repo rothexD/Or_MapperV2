@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.ExceptionServices;
 using System.Runtime.InteropServices;
@@ -16,6 +17,7 @@ using ShowcaseOrm.Show;
 
 namespace ShowcaseOrm
 {
+    [ExcludeFromCodeCoverage]
     internal class Program
     {
         private static void Main(string[] args)

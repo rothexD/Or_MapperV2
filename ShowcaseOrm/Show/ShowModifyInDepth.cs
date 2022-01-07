@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using ORMapper;
 using ORMapper.Caches;
 using ShowcaseOrm.Models;
 
 namespace ShowcaseOrm.Show
 {
+    [ExcludeFromCodeCoverage]
     public static class ShowModifyInDepth
     {
         public static void Show()

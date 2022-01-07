@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using Newtonsoft.Json;
 
 namespace ShowcaseOrm.Show
 {
+    [ExcludeFromCodeCoverage]
     public static class ShowHelper
     {
         private static int counter = 0;

@@ -1,9 +1,11 @@
-﻿using OrMapper.Attributes;
+﻿using System.Diagnostics.CodeAnalysis;
+using OrMapper.Attributes;
 
 namespace ShowcaseOrm.Models
 {
     /// <summary>This class represents a class in the school model.</summary>
     [Table(TableName = "CLASSES")]
+    [ExcludeFromCodeCoverage]
     public class Class
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

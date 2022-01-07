@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using ORMapper;
 using ShowcaseOrm.Models;
 
 namespace ShowcaseOrm.Show
 {
+    [ExcludeFromCodeCoverage]
     public class ShowCachingSaving
     {
         public static void Show()

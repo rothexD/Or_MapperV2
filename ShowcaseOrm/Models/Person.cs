@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using OrMapper.Attributes;
 
 namespace ShowcaseOrm.Models
 {
     /// <summary>This is a person implementation (from School example).</summary>
+    [ExcludeFromCodeCoverage]
     public abstract class Person
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
