@@ -2,13 +2,12 @@
 using System.Collections.Generic;
 using ORMapper.CustomQueryImproved.IFluentSqlInterfaces;
 using OrMapper.ExternalModels;
-
 namespace ORMapper.CustomQueryImproved
 {
     /// <summary>
     ///     provides a custom sql query filter fluent api
     /// </summary>
-    public class CustomQueryImproved : ITypeOfWhere, IConjunction, IJoinAndWhere
+    public class CustomGet<T> : ITypeOfWhere<T>, IConjunction<T>, IJoinAndWhere<T> where T : class
     {
         private readonly List<(string, object)> _parameterList = new();
         private readonly string _parameterPrefix;
@@ -16,31 +15,31 @@ namespace ORMapper.CustomQueryImproved
         private int _counter;
         private string _selectBlock = "";
 
-        private CustomQueryImproved(string parameterPrefix)
+        private CustomGet(string parameterPrefix)
         {
             _parameterPrefix = parameterPrefix;
         }
 
-        public ITypeOfWhere And()
+        public ITypeOfWhere<T> And()
         {
             _selectBlock += " AND ";
             return this;
         }
 
-        public ITypeOfWhere Or()
+        public ITypeOfWhere<T> Or()
         {
             _selectBlock += " OR ";
             return this;
         }
 
-        public IConjunction BracketOpen()
+        public IConjunction<T> BracketOpen()
         {
             _selectBlock += "(";
             _bracketCount++;
             return this;
         }
 
-        public IConjunction BracketClose()
+        public IConjunction<T> BracketClose()
         {
             _selectBlock += ")";
             _bracketCount--;
@@ -53,7 +52,7 @@ namespace ORMapper.CustomQueryImproved
         /// <typeparam name="T">requested type</typeparam>
         /// <returns>IList of requested Type</returns>
         /// <exception cref="Exception">mismatch in bracketcount</exception>
-        public IList<T> GetAllMatches<T>()
+        public IList<T> Execute()
         {
             if (_bracketCount != 0) throw new Exception("mismatching open and close in query");
             return (List<T>) Orm._CreateObjectAll(typeof(T), new List<object>(), (_selectBlock, _parameterList));
@@ -65,82 +64,81 @@ namespace ORMapper.CustomQueryImproved
         }
 
 
-        public ITypeOfWhere Where()
+        public ITypeOfWhere<T> Where()
         {
             _selectBlock += " WHERE ";
             return this;
         }
 
-        public IConjunction Equals<T1, T2>(T1 first, T2 second)
+        public IConjunction<T> Equals<T1, T2>(T1 first, T2 second)
         {
             TypeOfWhereHelper(first, second, "=");
 
             return this;
         }
 
-        public IConjunction NotEquals<T1, T2>(T1 first, T2 second)
+        public IConjunction<T> NotEquals<T1, T2>(T1 first, T2 second)
         {
             TypeOfWhereHelper(first, second, "!=");
             return this;
         }
 
-        public IConjunction Like<T1, T2>(T1 first, T2 second)
+        public IConjunction<T> Like<T1, T2>(T1 first, T2 second)
         {
             TypeOfWhereHelper(first, second, "LIKE");
             return this;
         }
 
-        public IConjunction NotLike<T1, T2>(T1 first, T2 second)
+        public IConjunction<T> NotLike<T1, T2>(T1 first, T2 second)
         {
             TypeOfWhereHelper(first, second, "NOT LIKE");
             return this;
         }
 
-        public IConjunction Smaller<T1, T2>(T1 first, T2 second)
+        public IConjunction<T> Smaller<T1, T2>(T1 first, T2 second)
         {
             TypeOfWhereHelper(first, second, "<");
             return this;
         }
 
-        public IConjunction Greater<T1, T2>(T1 first, T2 second)
+        public IConjunction<T> Greater<T1, T2>(T1 first, T2 second)
         {
             TypeOfWhereHelper(first, second, ">");
 
             return this;
         }
 
-        public IConjunction SmallerEquals<T1, T2>(T1 first, T2 second)
+        public IConjunction<T> SmallerEquals<T1, T2>(T1 first, T2 second)
         {
             TypeOfWhereHelper(first, second, "<=");
             return this;
         }
 
-        public IConjunction GreaterEquals<T1, T2>(T1 first, T2 second)
+        public IConjunction<T> GreaterEquals<T1, T2>(T1 first, T2 second)
         {
             TypeOfWhereHelper(first, second, ">=");
 
             return this;
         }
 
-        public ITypeOfWhere BracketOpen_()
+        public ITypeOfWhere<T> BracketOpen_()
         {
             _selectBlock += "(";
             _bracketCount++;
             return this;
         }
 
-        public ITypeOfWhere BracketClose_()
+        public ITypeOfWhere<T> BracketClose_()
         {
             _selectBlock += ")";
             _bracketCount--;
             return this;
         }
 
-        public static IJoinAndWhere Create(string parameterPrefix = ":")
+        public static IJoinAndWhere<T> Create(string parameterPrefix = ":")
         {
-            return new CustomQueryImproved(parameterPrefix);
+            return new CustomGet<T>(parameterPrefix);
         }
-
 
         private void TypeOfWhereHelper<T1, T2>(T1 first, T2 second, string insert)
         {

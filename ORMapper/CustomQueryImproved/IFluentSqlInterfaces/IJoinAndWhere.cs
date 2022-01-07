@@ -2,10 +2,10 @@
 
 namespace ORMapper.CustomQueryImproved.IFluentSqlInterfaces
 {
-    public interface IJoinAndWhere
+    public interface IJoinAndWhere<T>
     {
-        public IList<T> GetAllMatches<T>();
+        public IList<T> Execute();
         public (string, List<(string, object)>) OutputResult();
-        public ITypeOfWhere Where();
+        public ITypeOfWhere<T> Where();
     }
 }

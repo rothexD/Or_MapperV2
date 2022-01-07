@@ -2,13 +2,13 @@
 
 namespace ORMapper.CustomQueryImproved.IFluentSqlInterfaces
 {
-    public interface IConjunction
+    public interface IConjunction<T>
     {
-        public ITypeOfWhere And();
-        public ITypeOfWhere Or();
-        public IList<T> GetAllMatches<T>();
-        public IConjunction BracketClose();
-        public IConjunction BracketOpen();
+        public ITypeOfWhere<T> And();
+        public ITypeOfWhere<T> Or();
+        public IList<T> Execute();
+        public IConjunction<T> BracketClose();
+        public IConjunction<T> BracketOpen();
         public (string, List<(string, object)>) OutputResult();
     }
 }

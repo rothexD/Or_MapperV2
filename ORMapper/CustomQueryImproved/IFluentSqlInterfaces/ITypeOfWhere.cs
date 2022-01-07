@@ -1,17 +1,17 @@
 ﻿namespace ORMapper.CustomQueryImproved.IFluentSqlInterfaces
 {
-    public interface ITypeOfWhere
+    public interface ITypeOfWhere<T>
     {
-        public IConjunction Equals<T1, T2>(T1 first, T2 second);
-        public IConjunction NotEquals<T1, T2>(T1 first, T2 second);
-        public IConjunction Like<T1, T2>(T1 first, T2 second);
-        public IConjunction Smaller<T1, T2>(T1 first, T2 second);
-        public IConjunction Greater<T1, T2>(T1 first, T2 second);
-        public IConjunction SmallerEquals<T1, T2>(T1 first, T2 second);
-        public IConjunction GreaterEquals<T1, T2>(T1 first, T2 second);
-        public IConjunction NotLike<T1, T2>(T1 first, T2 second);
-        public ITypeOfWhere BracketClose_();
-        public ITypeOfWhere BracketOpen_();
+        public IConjunction<T> Equals<T1, T2>(T1 first, T2 second);
+        public IConjunction<T> NotEquals<T1, T2>(T1 first, T2 second);
+        public IConjunction<T> Like<T1, T2>(T1 first, T2 second);
+        public IConjunction<T> Smaller<T1, T2>(T1 first, T2 second);
+        public IConjunction<T> Greater<T1, T2>(T1 first, T2 second);
+        public IConjunction<T> SmallerEquals<T1, T2>(T1 first, T2 second);
+        public IConjunction<T> GreaterEquals<T1, T2>(T1 first, T2 second);
+        public IConjunction<T> NotLike<T1, T2>(T1 first, T2 second);
+        public ITypeOfWhere<T> BracketClose_();
+        public ITypeOfWhere<T> BracketOpen_();
 
     }
 }
