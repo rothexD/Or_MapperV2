@@ -10,7 +10,7 @@ namespace ShowcaseOrm.Show
     {
         public static void Show()
         {
-            ShowHelper.Begin("Showing Caching saving");
+            ShowHelper.BeginNewShowcase("Showing Caching saving");
 
             
             var a = Orm.Get<Teacher>("t.0");
@@ -30,7 +30,7 @@ namespace ShowcaseOrm.Show
             Orm.Save(c);
             
             
-            ShowHelper.End();
+            ShowHelper.EndNewShowcase();
         }
     }
 }

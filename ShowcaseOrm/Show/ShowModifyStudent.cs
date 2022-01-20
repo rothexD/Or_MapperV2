@@ -10,7 +10,7 @@ namespace ShowcaseOrm.Show
     {
         public static void Show(bool PrintToConsole = true)
         {
-            ShowHelper.Begin("Showing modify Student");
+            ShowHelper.BeginNewShowcase("Showing modify Student");
 
             var i = Orm.Get<Student>("s.0");
 
@@ -25,7 +25,7 @@ namespace ShowcaseOrm.Show
             Console.WriteLine(z.Gender);
             Console.WriteLine(z.Grade);
             
-            ShowHelper.End();
+            ShowHelper.EndNewShowcase();
         }
     }
 }

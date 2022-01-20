@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel.Design.Serialization;
 using System.Data;
 using System.Linq;
 using System.Transactions;
-using Microsoft.Extensions.Logging;
 using Npgsql;
 using ORMapper.Caches;
 using OrMapper.Helpers.extentions;
@@ -294,7 +292,6 @@ namespace ORMapper
         /// <param name="localCache"></param>
         /// <param name="pk">primary key</param>
         /// <param name="foreignKeyTablename"></param>
-        /// <param name="shouldMethodUseCaching"></param>
         /// <returns>All table entries that match the pk</returns>
         internal static object _CreateObjectAll(Type t, ICollection<object> localCache, object pk,
             string foreignKeyTablename)
@@ -466,7 +463,7 @@ namespace ORMapper
                                               + ":para1,:para2) ON CONFLICT (" +
                                               ent.Externals[i].TheirReferenceToThisColumnName + "," +
                                               ent.Externals[i].ColumnName + ") do nothing;";
-                        var z = x._GetTable().PrimaryKey.GetValue(x);
+                        
                         command.HelpWithParameter(":para1", x._GetTable().PrimaryKey.GetValue(x));
                         var y = ent.Externals[i].Table;
                         var y2 = y.PrimaryKey;
@@ -492,7 +489,7 @@ namespace ORMapper
         ///     delete a single table entry from db
         /// </summary>
         /// <param name="pk">primary key</param>
-        /// <typeparam name="t">table</typeparam>
+        /// <param name="t">table</param>
         internal static void _Delete(Type t, object pk)
         {
             var con = Connection();

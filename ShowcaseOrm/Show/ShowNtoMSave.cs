@@ -10,7 +10,7 @@ namespace ShowcaseOrm.Show
     {
         public static void Show()
         {
-            ShowHelper.Begin("Showing saving a n to m relation");
+            ShowHelper.BeginNewShowcase("Showing saving a n to m relation");
             
             
             var teacherExample = new Teacher();
@@ -99,7 +99,7 @@ namespace ShowcaseOrm.Show
             {
                 Console.WriteLine(yStudent.ID);
             }
-            ShowHelper.End();
+            ShowHelper.EndNewShowcase();
         }
     }
 }

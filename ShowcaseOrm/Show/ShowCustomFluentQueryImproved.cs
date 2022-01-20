@@ -11,18 +11,18 @@ namespace ShowcaseOrm.Show
     {
         public static void Show()
         {
-            ShowHelper.Begin("Showing customfluentquery with integer");
+            ShowHelper.BeginNewShowcase("Showing customfluentquery with integer");
             var x = CustomGet<Teacher>.Create().Where()
                 .Equals("Salary", SecureParameter.Create(50000)).Execute();
             ShowHelper.printNewtonsoftJson(x);
 
 
-            ShowHelper.Begin("Showing customfluentquery with caseinsentive name");
+            ShowHelper.BeginNewShowcase("Showing customfluentquery with caseinsentive name");
             var y = CustomGet<Teacher>.Create().Where()
                 .Equals("Name", "ZAPPELFISCH".MakeSecure().MakeCaseIns()).Execute();
             ShowHelper.printNewtonsoftJson(y);
             //throw new NotImplementedException("custom fluent query not implemented");
-            ShowHelper.End();
+            ShowHelper.EndNewShowcase();
         }
     }
 }

@@ -12,11 +12,11 @@ namespace ShowcaseOrm.Show
         /// <exception cref="NotImplementedException"></exception>
         public static void Show()
         {
-            ShowHelper.Begin("Showing transactions");
+            ShowHelper.BeginNewShowcase("Showing transactions");
             
             Console.WriteLine("using c# transactions manager, not sure how to fail");
             throw new NotImplementedException();
-            ShowHelper.End();  
+            ShowHelper.EndNewShowcase();  
         }
     }
 }

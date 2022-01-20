@@ -11,7 +11,7 @@ namespace ShowcaseOrm.Show
     {
         public static void Show(bool PrintToConsole = true)
         {
-            ShowHelper.Begin("Showing insert Student");
+            ShowHelper.BeginNewShowcase("Showing insert Student");
 
             var student = new Student();
             student.ID = "s.0";
@@ -31,7 +31,7 @@ namespace ShowcaseOrm.Show
             Console.WriteLine(i.Gender);
             Console.WriteLine(i.Grade);
             
-            ShowHelper.End();
+            ShowHelper.EndNewShowcase();
         }
     }
 }

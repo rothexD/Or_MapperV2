@@ -11,7 +11,7 @@ namespace ShowcaseOrm.Show
     {
         public static void Show()
         {
-            ShowHelper.Begin("Showing saving a 1 to n relation");
+            ShowHelper.BeginNewShowcase("Showing saving a 1 to n relation");
             
             var teacher1ton = new Teacher();
             teacher1ton.ID = "t.1";
@@ -52,7 +52,7 @@ namespace ShowcaseOrm.Show
             Console.WriteLine(i.Courses[0].ID);
             Console.WriteLine(i.Courses[1].Name);
             Console.WriteLine(i.Courses[1].ID);
-            ShowHelper.End();
+            ShowHelper.EndNewShowcase();
         }
     }
 }

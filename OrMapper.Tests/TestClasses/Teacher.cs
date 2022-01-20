@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using OrMapper.Attributes;
 using ShowcaseOrm.Models;
 
@@ -7,6 +8,7 @@ namespace OrMapper.Tests.TestClasses
 {
     /// <summary>This is a teacher implementation (from School example).</summary>
     [Table(TableName = "TEACHERS")]
+    [ExcludeFromCodeCoverage]
     public class Teacher : Person
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

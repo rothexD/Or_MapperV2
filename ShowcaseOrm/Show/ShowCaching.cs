@@ -11,7 +11,7 @@ namespace ShowcaseOrm.Show
     {
         public static void Show()
         {
-            ShowHelper.Begin("Showing Caching load");
+            ShowHelper.BeginNewShowcase("Showing Caching load");
 
             
             var a = Orm.Get<Teacher>("t.0");
@@ -20,7 +20,7 @@ namespace ShowcaseOrm.Show
             Console.WriteLine("instance number of teacher t.0 a: "+a.InstanceNumber);
             Console.WriteLine("instance number of teacher t.0 b: "+b.InstanceNumber);
             
-            ShowHelper.End();
+            ShowHelper.EndNewShowcase();
         }
     }
 }

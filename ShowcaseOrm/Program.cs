@@ -1,18 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Runtime.ExceptionServices;
-using System.Runtime.InteropServices;
-using System.Threading;
+﻿using System.Diagnostics.CodeAnalysis;
 using ORMapper;
-using ORMapper.Caches;
-using ORMapper.CustomQueryImproved;
-using OrMapper.Helpers;
 using OrMapper.Helpers.extentions;
-using ORMapper.Models;
-using ShowcaseOrm.Models;
 using ShowcaseOrm.Show;
 
 namespace ShowcaseOrm
@@ -22,14 +10,15 @@ namespace ShowcaseOrm
     {
         private static void Main(string[] args)
         {
-            Orm.ConnectionString = "Server=127.0.0.1;Port=5432;Database=remote;User Id=remote_user;Password=remote_password;";
+            Orm.ConnectionString =
+                "Server=127.0.0.1;Port=5432;Database=remote;User Id=remote_user;Password=remote_password;";
 
             ShowMapTablesAndTypes.Show(true);
-            
+
             ShowInsertStudent.Show();
             ShowModifyStudent.Show();
 
-            
+
             Show1To1Save.Show();
             Show1ToNSave.Show();
             ShowNtoMSave.Show();
@@ -37,17 +26,19 @@ namespace ShowcaseOrm
             ShowGetAllCourses.Show();
 
             ShowModifyInDepth.Show();
-            
-            
+
+
             Showcaching.Show();
             ShowCachingSaving.Show();
-            
+
             ShowCustomFluentQueryImproved.Show();
-            
-            ShowHelper.Begin($"Used a total of {Counter.LongTermCounter} connections!");
-            ShowHelper.End();
-            
-            //transactions are supported with transaction scope.. not self implemented
+
+            ShowHelper.BeginNewShowcase($"Used a total of {Counter.LongTermCounter} connections!");
+            ShowHelper.EndNewShowcase();
+
+            ShowDeleteFromDb.Show();
+
+            //transactions are supported with transaction scope
             ShowTransaction.Show();
         }
     }

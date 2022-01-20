@@ -11,7 +11,7 @@ namespace ShowcaseOrm.Show
     {
         public static void Show()
         {
-            ShowHelper.Begin("Showing modify in depth");
+            ShowHelper.BeginNewShowcase("Showing modify in depth");
 
             var i = Orm.Get<Teacher>("t.2");
 
@@ -22,7 +22,7 @@ namespace ShowcaseOrm.Show
             Orm.Save(i);
             
             Console.WriteLine(Orm.Get<Student>(safe).Grade);
-            ShowHelper.End();
+            ShowHelper.EndNewShowcase();
         }
     }
 }

@@ -10,7 +10,7 @@ namespace ShowcaseOrm.Show
     {
         public static void Show()
         {
-            ShowHelper.Begin("Get all Students");
+            ShowHelper.BeginNewShowcase("Get all Students");
             
             var i = Orm.GetAll<Course>();
             ShowHelper.printNewtonsoftJson(i);

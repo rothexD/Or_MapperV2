@@ -1,9 +1,11 @@
-﻿using OrMapper.Attributes;
+﻿using System.Diagnostics.CodeAnalysis;
+using OrMapper.Attributes;
 
 namespace OrMapper.Tests.TestClasses
 {
     /// <summary>This class represents a class in the school model.</summary>
     [Table(TableName = "CLASSES")]
+    [ExcludeFromCodeCoverage]
     internal class Class
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

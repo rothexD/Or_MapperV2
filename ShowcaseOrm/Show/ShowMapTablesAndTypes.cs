@@ -11,7 +11,7 @@ namespace ShowcaseOrm.Show
     {
         public static void Show(bool automaticInsertIntoDb = false)
         {
-            ShowHelper.Begin("Showing OrMapping");
+            ShowHelper.BeginNewShowcase("Showing OrMapping");
             
             List<Type> tables = new();
             tables.Add(typeof(Gender));
@@ -28,7 +28,7 @@ namespace ShowcaseOrm.Show
             //
             
             
-            ShowHelper.End();
+            ShowHelper.EndNewShowcase();
         }
     }
 }
